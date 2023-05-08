@@ -25,10 +25,28 @@ $(document).ready(function() {
 
 	//event handlers
 	$("#main-start-button").click(function() {
-		game.start();
+		//game.start();
+		$("#main-div").css("display", "none");
+		$("#level").css("display", "block");
+	});
+	$("#level-easy").click(function(){
+		$("#level").css("display", "none");
+		$("#canvas-wrapper").css("display", "block");
+	});
+	$("#level-normal").click(function(){
+		$("#level").css("display", "none");
+		$("#canvas-wrapper").css("display", "block");
+	});
+	$("#level-hard").click(function(){
+		$("#level").css("display", "none");
+		$("#canvas-wrapper").css("display", "block");
+	});
+	$("#main-settings-button").click(function(){
+		$("#main-div").css("display", "none");
+		$("#settings").css("display", "block");
 	});
 	//...
-})
+});
 
 class Game {
 	//생성자
