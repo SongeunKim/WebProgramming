@@ -1,10 +1,10 @@
-let mouseX;		//현재 마우스 x좌표(board 기준)
-let board;		//board element
-let boardCtx;	//board context
-let boardLeft;	//board 왼쪽 여백 길이
-let boardWidth;	//board 너비
-let boardHeight;//board 높이
-let game;		//gamemanager
+let mouseX; //현재 마우스 x좌표(board 기준)
+let board; //board element
+let boardCtx; //board context
+let boardLeft; //board 왼쪽 여백 길이
+let boardWidth; //board 너비
+let boardHeight; //board 높이
+let game; //gamemanager
 
 //ready
 $(document).ready(function() {
@@ -33,8 +33,8 @@ $(document).ready(function() {
 class Game {
 	//생성자
 	constructor() {
-		this.bar = new Bar("src/bar.png", 100, 20, 10);	//막대 객체
-		this.interval;									//update interval
+		this.bar = new Bar("src/bar.png", 100, 20, 10); //막대 객체
+		this.interval; //update interval
 		//...
 	}
 
@@ -80,13 +80,13 @@ class Game {
 class Bar {
 	//생성자
 	constructor(image, width, height, speed) {
-		this.image = new Image();	//막대 이미지 인스턴스
+		this.image = new Image(); //막대 이미지 인스턴스
 		this.image.src = image;
-		this.width = width;			//너비
-		this.height = height;		//높이
-		this.x = 0;					//x좌표
-		this.y = boardHeight - 10;	//y좌표
-		this.speed = speed;			//속도
+		this.width = width; //너비
+		this.height = height; //높이
+		this.x = 0; //x좌표
+		this.y = boardHeight - 10; //y좌표
+		this.speed = speed; //속도
 	}
 
 	//위치 계산 함수
