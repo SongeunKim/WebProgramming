@@ -10,7 +10,7 @@ let game; //gamemanager
 $(document).ready(function() {
 	//initialize
 	mouseX = 0;
-	board = $("#board").get(0)
+	board = $("#board").get(0);
 	boardCtx = board.getContext("2d");
 	boardLeft = board.getBoundingClientRect().left;
 	boardWidth = board.getBoundingClientRect().width;
@@ -25,21 +25,23 @@ $(document).ready(function() {
 
 	//event handlers
 	$("#main-start-button").click(function() {
-		game.start();
 		$("#main-div").css("display", "none");
 		$("#level").css("display", "block");
 	});
 	$("#level-easy").click(function(){
 		$("#level").css("display", "none");
 		$("#canvas-wrapper").css("display", "block");
+		game.start();
 	});
 	$("#level-normal").click(function(){
 		$("#level").css("display", "none");
 		$("#canvas-wrapper").css("display", "block");
+		game.start();
 	});
 	$("#level-hard").click(function(){
 		$("#level").css("display", "none");
 		$("#canvas-wrapper").css("display", "block");
+		game.start();
 	});
 	$("#main-settings-button").click(function(){
 		$("#main-div").css("display", "none");
@@ -52,7 +54,7 @@ class Game {
 	//생성자
 	constructor() {
 		this.bar = new Bar("src/bar.png", 100, 20, 10); //막대 객체
-		this.brick = new brick();
+		this.brick = new Brick();
 		this.interval; //update interval
 		//...
 	}
@@ -137,23 +139,23 @@ class Brick {
 		this.brickOffsetTop = 30;
 		this.brickOffsetLeft = 30;
 		this.bricks = [];
-		for(var i=0; i<brickColumnCount; i++){
-			bricks[i] = [];
-			for(var j=0; j<brickRowCount; j++){
-				bricks[i][j] = {x: 0, y: 0};
+		for(var i=0; i<this.brickColumnCount; i++){
+			this.bricks[i] = [];
+			for(var j=0; j<this.brickRowCount; j++){
+				this.bricks[i][j] = {x: 0, y: 0};
 			}
 		}
 	}
 	
 	draw(){
-		for(var i=0; i<brickColumnCount; i++){
-			for(var j=0; j<brickRowCount; j++){
-				var brickX = (i*(brickWidth+brickPadding))+brickOffsetLeft;
-				var brickY = (j*(brickHeight+brickPadding))+brickOffsetTop;
-				bricks[i][j].x = brickX;
-				bricks[i][j].y = brickY;
+		for(var i=0; i<this.brickColumnCount; i++){
+			for(var j=0; j<this.brickRowCount; j++){
+				var brickX = (i*(this.brickWidth+this.brickPadding))+this.brickOffsetLeft;
+				var brickY = (j*(this.brickHeight+this.brickPadding))+this.brickOffsetTop;
+				this.bricks[i][j].x = brickX;
+				this.bricks[i][j].y = brickY;
 				boardCtx.beginPath();
-				boardCtx.rect(brickX,brickY,brickWidth,brickHeight);
+				boardCtx.rect(brickX,brickY,this.brickWidth,this.brickHeight);
 				boardCtx.fillStyle = "#0095DD";
 				boardCtx.fill();
 				boardCtx.closePath();
