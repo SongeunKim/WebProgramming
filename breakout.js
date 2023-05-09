@@ -25,7 +25,7 @@ $(document).ready(function() {
 
 	//event handlers
 	$("#main-start-button").click(function() {
-		//game.start();
+		game.start();
 		$("#main-div").css("display", "none");
 		$("#level").css("display", "block");
 	});
@@ -52,6 +52,7 @@ class Game {
 	//생성자
 	constructor() {
 		this.bar = new Bar("src/bar.png", 100, 20, 10); //막대 객체
+		this.brick = new brick();
 		this.interval; //update interval
 		//...
 	}
@@ -91,6 +92,7 @@ class Game {
 	draw() {
 		boardCtx.clearRect(0, 0, boardWidth, boardHeight);
 		this.bar.draw();
+		this.brick.draw();
 		//...
 	}
 }
@@ -126,5 +128,36 @@ class Ball {
 }
 
 class Brick {
-	//...
+	constructor(){
+		this.brickRowCount = 3;
+		this.brickColumnCount = 5;
+		this.brickWidth = 75;
+		this.brickHeight = 20;
+		this.brickPadding = 10;
+		this.brickOffsetTop = 30;
+		this.brickOffsetLeft = 30;
+		this.bricks = [];
+		for(var i=0; i<brickColumnCount; i++){
+			bricks[i] = [];
+			for(var j=0; j<brickRowCount; j++){
+				bricks[i][j] = {x: 0, y: 0};
+			}
+		}
+	}
+	
+	draw(){
+		for(var i=0; i<brickColumnCount; i++){
+			for(var j=0; j<brickRowCount; j++){
+				var brickX = (i*(brickWidth+brickPadding))+brickOffsetLeft;
+				var brickY = (j*(brickHeight+brickPadding))+brickOffsetTop;
+				bricks[i][j].x = brickX;
+				bricks[i][j].y = brickY;
+				boardCtx.beginPath();
+				boardCtx.rect(brickX,brickY,brickWidth,brickHeight);
+				boardCtx.fillStyle = "#0095DD";
+				boardCtx.fill();
+				boardCtx.closePath();
+			}
+		}
+	}
 }
