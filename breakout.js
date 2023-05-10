@@ -2,8 +2,8 @@ let mouseX; //현재 마우스 x좌표(board 기준)
 let board; //board element
 let boardCtx; //board context
 let boardLeft; //board 왼쪽 여백 길이
-let boardWidth; //board 너비
-let boardHeight; //board 높이
+const boardWidth = 900; //board 너비
+const boardHeight = 600; //board 높이
 let game; //gamemanager
 
 //ready
@@ -13,13 +13,16 @@ $(document).ready(function() {
 	board = $("#board").get(0);
 	boardCtx = board.getContext("2d");
 	boardLeft = board.getBoundingClientRect().left;
-	boardWidth = board.getBoundingClientRect().width;
-	boardHeight = board.getBoundingClientRect().height;
+	board.width = boardWidth;
+	board.height = boardHeight;
 	game = new Game();
 
 	//events
 	$(document).mousemove(function(e) {
 		mouseX = e.pageX - boardLeft;
+	})
+	$(window).resize(function(e) {
+		boardLeft = board.getBoundingClientRect().left;
 	})
 	//...
 
@@ -81,6 +84,7 @@ class Game {
 
 	//게임 환경 초기화 함수
 	init() {
+		boardLeft = board.getBoundingClientRect().left;
 		//...
 	}
 
@@ -107,7 +111,7 @@ class Bar {
 		this.width = width; //너비
 		this.height = height; //높이
 		this.x = 0; //x좌표
-		this.y = boardHeight - 10; //y좌표
+		this.y = boardHeight - this.height*2; //y좌표
 		this.speed = speed; //속도
 	}
 
@@ -117,6 +121,7 @@ class Bar {
 			this.x += Math.min(this.speed, mouseX - this.x);
 		else if (this.x > mouseX && this.x > this.width/2)
 			this.x -= Math.min(this.speed, this.x - mouseX);
+		this.y = boardHeight - this.height*2;
 	}
 
 	//그리기 함수
