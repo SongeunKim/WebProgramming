@@ -2,48 +2,56 @@ let mouseX; //현재 마우스 x좌표(board 기준)
 let board; //board element
 let boardCtx; //board context
 let boardLeft; //board 왼쪽 여백 길이
-let boardWidth; //board 너비
-let boardHeight; //board 높이
+const boardWidth = 900; //board 너비
+const boardHeight = 600; //board 높이
 let game; //gamemanager
 
 //ready
 $(document).ready(function() {
 	//initialize
 	mouseX = 0;
-	board = $("#board").get(0)
+	board = $("#board").get(0);
 	boardCtx = board.getContext("2d");
 	boardLeft = board.getBoundingClientRect().left;
-	boardWidth = board.getBoundingClientRect().width;
-	boardHeight = board.getBoundingClientRect().height;
+	board.width = boardWidth;
+	board.height = boardHeight;
 	game = new Game();
 
 	//events
 	$(document).mousemove(function(e) {
 		mouseX = e.pageX - boardLeft;
 	})
+	$(window).resize(function(e) {
+		boardLeft = board.getBoundingClientRect().left;
+	})
 	//...
 
 	//event handlers
 	$("#main-start-button").click(function() {
-		game.start();
-		$("#main-div").css("display", "none");
 		$("#level").css("display", "block");
+		popUp($("#level"));
 	});
 	$("#level-easy").click(function(){
 		$("#level").css("display", "none");
+		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
+		game.start();
 	});
 	$("#level-normal").click(function(){
 		$("#level").css("display", "none");
+		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
+		game.start();
 	});
 	$("#level-hard").click(function(){
 		$("#level").css("display", "none");
+		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
+		game.start();
 	});
 	$("#main-settings-button").click(function(){
-		$("#main-div").css("display", "none");
 		$("#settings").css("display", "block");
+		popUp($("#settings"));
 	});
 	//...
 });
@@ -52,7 +60,7 @@ class Game {
 	//생성자
 	constructor() {
 		this.bar = new Bar("src/bar.png", 100, 20, 10); //막대 객체
-		this.brick = new brick();
+		this.brick = new Brick();
 		this.ball = new Ball();
 		this.interval; //update interval
 		//...
@@ -80,6 +88,7 @@ class Game {
 
 	//게임 환경 초기화 함수
 	init() {
+		boardLeft = board.getBoundingClientRect().left;
 		//...
 	}
 
@@ -106,7 +115,7 @@ class Bar {
 		this.width = width; //너비
 		this.height = height; //높이
 		this.x = 0; //x좌표
-		this.y = boardHeight - 10; //y좌표
+		this.y = boardHeight - this.height*2; //y좌표
 		this.speed = speed; //속도
 	}
 
@@ -116,6 +125,7 @@ class Bar {
 			this.x += Math.min(this.speed, mouseX - this.x);
 		else if (this.x > mouseX && this.x > this.width/2)
 			this.x -= Math.min(this.speed, this.x - mouseX);
+		this.y = boardHeight - this.height*2;
 	}
 
 	//그리기 함수
@@ -155,27 +165,33 @@ class Brick {
 		this.brickOffsetTop = 30;
 		this.brickOffsetLeft = 30;
 		this.bricks = [];
-		for(var i=0; i<brickColumnCount; i++){
-			bricks[i] = [];
-			for(var j=0; j<brickRowCount; j++){
-				bricks[i][j] = {x: 0, y: 0};
+		for(var i=0; i<this.brickColumnCount; i++){
+			this.bricks[i] = [];
+			for(var j=0; j<this.brickRowCount; j++){
+				this.bricks[i][j] = {x: 0, y: 0};
 			}
 		}
 	}
 	
 	draw(){
-		for(var i=0; i<brickColumnCount; i++){
-			for(var j=0; j<brickRowCount; j++){
-				var brickX = (i*(brickWidth+brickPadding))+brickOffsetLeft;
-				var brickY = (j*(brickHeight+brickPadding))+brickOffsetTop;
-				bricks[i][j].x = brickX;
-				bricks[i][j].y = brickY;
+		for(var i=0; i<this.brickColumnCount; i++){
+			for(var j=0; j<this.brickRowCount; j++){
+				var brickX = (i*(this.brickWidth+this.brickPadding))+this.brickOffsetLeft;
+				var brickY = (j*(this.brickHeight+this.brickPadding))+this.brickOffsetTop;
+				this.bricks[i][j].x = brickX;
+				this.bricks[i][j].y = brickY;
 				boardCtx.beginPath();
-				boardCtx.rect(brickX,brickY,brickWidth,brickHeight);
+				boardCtx.rect(brickX,brickY,this.brickWidth,this.brickHeight);
 				boardCtx.fillStyle = "#0095DD";
 				boardCtx.fill();
 				boardCtx.closePath();
 			}
 		}
 	}
+}
+
+function popUp(obj){
+	var w = ($(window).width()-obj.width())/2;
+	var h = ($(window).height()-obj.width())/2;
+	obj.css({top:h, left:w});
 }

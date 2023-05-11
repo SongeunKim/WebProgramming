@@ -59,7 +59,11 @@ body {
 
 .popup {
 	display: none;
-	margin: 150px 200px;
+	position: fixed;
+	top:0;
+	left:0;
+	z-index: 1;
+	/*margin: 150px 200px;*/
 	width: 500px;
 	height: 400px;
 	background-color: darkgray;
