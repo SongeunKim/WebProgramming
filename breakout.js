@@ -137,21 +137,23 @@ class Bar {
 class Ball {
 	constructor(){
 		this.ballRadius = 10;
-		this.ballX = 50;
-		this.ballY = 50;
+		this.ballX = boardWidth/2;
+		this.ballY = boardHeight/2;
+		this.ballDX = 3;
+		this.ballDY = 3;
 	}
 	draw(){
 		boardCtx.beginPath();
 		boardCtx.fillStyle = "red";
-		boardCtx.arc(ballX, ballY, this.ballRadius, 0, Math.PI*2, true )
+		boardCtx.arc(this.ballX, this.ballY, this.ballRadius, 0, Math.PI*2, true )
 		boardCtx.closePath();
 		boardCtx.fill();
-		if (x < (0 + this.ballRadius)|| x> (boardWidth-this.ballRadius))
-				dx=-dx;
-			if (y < (0+this.ballRadius) || y > (boardheight-this.ballRadius))
-				dy = -dy;
-			x += dx;
-			y += dy;
+		if (this.ballX < (0 + this.ballRadius) || this.ballX > (boardWidth-this.ballRadius))
+			this.ballDX=-this.ballDX;
+		if (this.ballY < (0 + this.ballRadius) || this.ballY > (boardHeight-this.ballRadius))
+			this.ballDY = -this.ballDY;
+		this.ballX += this.ballDX;
+		this.ballY += this.ballDY;
 	}
 }
 
