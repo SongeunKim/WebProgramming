@@ -148,9 +148,15 @@ class Ball {
 		boardCtx.arc(this.ballX, this.ballY, this.ballRadius, 0, Math.PI*2, true )
 		boardCtx.closePath();
 		boardCtx.fill();
+		if (this.ballY > (boardHeight + this.ballRadius*30)){
+			this.ballX = boardWidth/2;
+			this.ballY = boardHeight/2;
+			this.ballDX = 5;
+			this.ballDY = 5;
+		}
 		if (this.ballX < (0 + this.ballRadius) || this.ballX > (boardWidth-this.ballRadius))
 			this.ballDX = -this.ballDX;
-		if (this.ballY < (0 + this.ballRadius) || this.ballY > (boardHeight-this.ballRadius))
+		if (this.ballY < (0 + this.ballRadius))
 			this.ballDY = -this.ballDY;
 		if (this.ballY > y - height/2 && this.ballX > x - width/2 && this.ballX < x + width/2)
 			this.ballDY = -this.ballDY;
