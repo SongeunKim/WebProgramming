@@ -53,6 +53,7 @@ class Game {
 	constructor() {
 		this.bar = new Bar("src/bar.png", 100, 20, 10); //막대 객체
 		this.brick = new brick();
+		this.ball = new Ball();
 		this.interval; //update interval
 		//...
 	}
@@ -93,7 +94,7 @@ class Game {
 		boardCtx.clearRect(0, 0, boardWidth, boardHeight);
 		this.bar.draw();
 		this.brick.draw();
-		//...
+		this.ball.draw();
 	}
 }
 
@@ -124,7 +125,24 @@ class Bar {
 }
 
 class Ball {
-	//...
+	constructor(){
+		this.ballRadius = 10;
+		this.ballX = 50;
+		this.ballY = 50;
+	}
+	draw(){
+		boardCtx.beginPath();
+		boardCtx.fillStyle = "red";
+		boardCtx.arc(ballX, ballY, this.ballRadius, 0, Math.PI*2, true )
+		boardCtx.closePath();
+		boardCtx.fill();
+		if (x < (0 + this.ballRadius)|| x> (boardWidth-this.ballRadius))
+				dx=-dx;
+			if (y < (0+this.ballRadius) || y > (boardheight-this.ballRadius))
+				dy = -dy;
+			x += dx;
+			y += dy;
+	}
 }
 
 class Brick {
