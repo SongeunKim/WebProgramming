@@ -28,27 +28,30 @@ $(document).ready(function() {
 
 	//event handlers
 	$("#main-start-button").click(function() {
-		$("#main-div").css("display", "none");
 		$("#level").css("display", "block");
+		popUp($("#level"));
 	});
 	$("#level-easy").click(function(){
 		$("#level").css("display", "none");
+		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
 		game.start();
 	});
 	$("#level-normal").click(function(){
 		$("#level").css("display", "none");
+		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
 		game.start();
 	});
 	$("#level-hard").click(function(){
 		$("#level").css("display", "none");
+		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
 		game.start();
 	});
 	$("#main-settings-button").click(function(){
-		$("#main-div").css("display", "none");
 		$("#settings").css("display", "block");
+		popUp($("#settings"));
 	});
 	//...
 });
@@ -167,4 +170,10 @@ class Brick {
 			}
 		}
 	}
+}
+
+function popUp(obj){
+	var w = ($(window).width()-obj.width())/2;
+	var h = ($(window).height()-obj.width())/2;
+	obj.css({top:h, left:w});
 }
