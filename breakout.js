@@ -4,6 +4,11 @@ let boardCtx; //board context
 let boardLeft; //board 왼쪽 여백 길이
 const boardWidth = 900; //board 너비
 const boardHeight = 600; //board 높이
+let brickWidth;
+let brickHeight;
+let brickRowCount;
+let brickColumnCount;
+let bricks = [];
 let game; //gamemanager
 
 //ready
@@ -77,6 +82,7 @@ class Game {
 	update() {
 		game.calculate();
 		game.draw();
+		game.ball.collisionDetection();
 		//...
 	}
 
@@ -148,11 +154,9 @@ class Ball {
 		boardCtx.arc(this.ballX, this.ballY, this.ballRadius, 0, Math.PI*2, true )
 		boardCtx.closePath();
 		boardCtx.fill();
-		if (this.ballY > (boardHeight + this.ballRadius*30)){
+		if (this.ballY > (boardHeight + this.ballRadius)){
 			this.ballX = boardWidth/2;
 			this.ballY = boardHeight/2;
-			this.ballDX = 5;
-			this.ballDY = 5;
 		}
 		if (this.ballX < (0 + this.ballRadius) || this.ballX > (boardWidth-this.ballRadius))
 			this.ballDX = -this.ballDX;
@@ -163,35 +167,35 @@ class Ball {
 		this.ballX += this.ballDX;
 		this.ballY += this.ballDY;
 	}
+	collisionDetection() {
+		for (let i = 0; i < brickColumnCount; ++i) {
+			for (let q = 0; q < brickRowCount; ++q) {
+				let b = bricks[i][q];
+				if (this.ballX > b.x - this.ballRadius && this.ballX < b.x + brickWidth + this.ballRadius  && this.ballY > b.y - this.ballRadius && this.ballY < b.y + brickHeight + this.ballRadius) {
+						this.ballDY = -this.ballDY;
+				}
+			}
+		}
+	}
 }
 
 class Brick {
 	constructor(){
-		this.brickRowCount = 3;
-		this.brickColumnCount = 5;
-		this.brickWidth = 75;
-		this.brickHeight = 20;
+		BrickSetting(3, 5, 75, 20);
 		this.brickPadding = 10;
 		this.brickOffsetTop = 30;
-		this.brickOffsetLeft = 30;
-		this.bricks = [];
-		for(var i=0; i<this.brickColumnCount; i++){
-			this.bricks[i] = [];
-			for(var j=0; j<this.brickRowCount; j++){
-				this.bricks[i][j] = {x: 0, y: 0};
-			}
-		}
+		this.brickOffsetLeft = 30;	
 	}
 	
 	draw(){
-		for(var i=0; i<this.brickColumnCount; i++){
-			for(var j=0; j<this.brickRowCount; j++){
-				var brickX = (i*(this.brickWidth+this.brickPadding))+this.brickOffsetLeft;
-				var brickY = (j*(this.brickHeight+this.brickPadding))+this.brickOffsetTop;
-				this.bricks[i][j].x = brickX;
-				this.bricks[i][j].y = brickY;
+		for(var i=0; i<brickColumnCount; i++){
+			for(var j=0; j<brickRowCount; j++){
+				var brickX = (i*(brickWidth+this.brickPadding))+this.brickOffsetLeft;
+				var brickY = (j*(brickHeight+this.brickPadding))+this.brickOffsetTop;
+				bricks[i][j].x = brickX;
+				bricks[i][j].y = brickY;
 				boardCtx.beginPath();
-				boardCtx.rect(brickX,brickY,this.brickWidth,this.brickHeight);
+				boardCtx.rect(brickX, brickY, brickWidth, brickHeight);
 				boardCtx.fillStyle = "#0095DD";
 				boardCtx.fill();
 				boardCtx.closePath();
@@ -204,4 +208,17 @@ function popUp(obj){
 	var w = ($(window).width()-obj.width())/2;
 	var h = ($(window).height()-obj.width())/2;
 	obj.css({top:h, left:w});
+}
+
+function BrickSetting(rowNum, colNum, width, height) {
+	brickRowCount = rowNum;
+	brickColumnCount = colNum;
+	brickWidth = width;
+	brickHeight = height;
+	for(var i=0; i<brickColumnCount; i++){
+		bricks[i] = [];
+		for(var j=0; j<brickRowCount; j++){
+			bricks[i][j] = {x: 0, y: 0};
+		}
+	}
 }
