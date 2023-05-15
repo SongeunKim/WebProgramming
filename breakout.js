@@ -4,11 +4,6 @@ let boardCtx; //board context
 let boardLeft; //board 왼쪽 여백 길이
 const boardWidth = 900; //board 너비
 const boardHeight = 600; //board 높이
-let brickWidth;
-let brickHeight;
-let brickRowCount;
-let brickColumnCount;
-let bricks = [];
 let game; //gamemanager
 
 //ready
@@ -65,7 +60,7 @@ class Game {
 	//생성자
 	constructor() {
 		this.bar = new Bar("src/bar.png", 100, 20, 10); //막대 객체
-		this.brick = new Brick();
+		this.brick = new Brick(3, 5, 75, 20);
 		this.ball = new Ball();
 		this.interval; //update interval
 		//...
@@ -82,7 +77,7 @@ class Game {
 	update() {
 		game.calculate();
 		game.draw();
-		game.ball.collisionDetection();
+		game.ball.collisionDetection(game.brick);
 		//...
 	}
 
@@ -145,8 +140,8 @@ class Ball {
 		this.ballRadius = 10;
 		this.ballX = boardWidth/2;
 		this.ballY = boardHeight/2;
-		this.ballDX = 5;
-		this.ballDY = 5;
+		this.ballDX = 1;
+		this.ballDY = 1;
 	}
 	draw(x, y, width, height){
 		boardCtx.beginPath();
@@ -162,17 +157,26 @@ class Ball {
 			this.ballDX = -this.ballDX;
 		if (this.ballY < (0 + this.ballRadius))
 			this.ballDY = -this.ballDY;
-		if (this.ballY > y - height/2 && this.ballX > x - width/2 && this.ballX < x + width/2)
-			this.ballDY = -this.ballDY;
+		if((this.ballY + this.ballRadius > y)&&(this.ballY - this.ballRadius < y + height)&&(this.ballX > x - width/2) && (this.ballX < x + width/2)){
+			if(this.ballY + this.ballRadius - this.ballDY > y) {
+				if(x > this.ballX)
+					this.ballX = x - width/2 - this.ballRadius;
+				else
+					this.ballX = x + width/2 + this.ballRadius;
+				this.ballDX = -this.ballDX;
+			}
+			else this.ballDY = -this.ballDY;
+		}
 		this.ballX += this.ballDX;
 		this.ballY += this.ballDY;
 	}
-	collisionDetection() {
-		for (let i = 0; i < brickColumnCount; ++i) {
-			for (let q = 0; q < brickRowCount; ++q) {
-				let b = bricks[i][q];
-				if (this.ballX > b.x - this.ballRadius && this.ballX < b.x + brickWidth + this.ballRadius  && this.ballY > b.y - this.ballRadius && this.ballY < b.y + brickHeight + this.ballRadius) {
+	collisionDetection(brickObject) {
+		for (let i = 0; i < brickObject.brickColumnCount; i++) {
+			for (let q = 0; q < brickObject.brickRowCount; q++) {
+				let b = brickObject.bricks[i][q];
+				if ((this.ballX > b.x - this.ballRadius && this.ballX < b.x + brickObject.brickWidth + this.ballRadius  && this.ballY > b.y - this.ballRadius && this.ballY < b.y + brickObject.brickHeight + this.ballRadius)&&b.durability!=0) {
 						this.ballDY = -this.ballDY;
+						b.durability--;
 				}
 			}
 		}
@@ -180,22 +184,33 @@ class Ball {
 }
 
 class Brick {
-	constructor(){
-		BrickSetting(3, 5, 75, 20);
+	constructor(rowNum, colNum, width, height){
+		this.brickRowCount = rowNum;
+		this.brickColumnCount = colNum;
 		this.brickPadding = 10;
 		this.brickOffsetTop = 30;
-		this.brickOffsetLeft = 30;	
+		this.brickOffsetLeft = 30;
+		this.brickWidth = width;
+		this.brickHeight = height;
+		this.bricks = [];
+		for(var i=0; i<this.brickColumnCount; i++){
+			this.bricks[i] = [];
+			for(var j=0; j<this.brickRowCount; j++){
+				this.bricks[i][j] = {x: 0, y: 0, durability: 1};
+			}
+		}	
 	}
 	
 	draw(){
-		for(var i=0; i<brickColumnCount; i++){
-			for(var j=0; j<brickRowCount; j++){
-				var brickX = (i*(brickWidth+this.brickPadding))+this.brickOffsetLeft;
-				var brickY = (j*(brickHeight+this.brickPadding))+this.brickOffsetTop;
-				bricks[i][j].x = brickX;
-				bricks[i][j].y = brickY;
+		for(var i=0; i<this.brickColumnCount; i++){
+			for(var j=0; j<this.brickRowCount; j++){
+				if(this.bricks[i][j].durability == 0) continue;
+				var brickX = (i*(this.brickWidth+this.brickPadding))+this.brickOffsetLeft;
+				var brickY = (j*(this.brickHeight+this.brickPadding))+this.brickOffsetTop;
+				this.bricks[i][j].x = brickX;
+				this.bricks[i][j].y = brickY;
 				boardCtx.beginPath();
-				boardCtx.rect(brickX, brickY, brickWidth, brickHeight);
+				boardCtx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
 				boardCtx.fillStyle = "#0095DD";
 				boardCtx.fill();
 				boardCtx.closePath();
@@ -208,17 +223,4 @@ function popUp(obj){
 	var w = ($(window).width()-obj.width())/2;
 	var h = ($(window).height()-obj.width())/2;
 	obj.css({top:h, left:w});
-}
-
-function BrickSetting(rowNum, colNum, width, height) {
-	brickRowCount = rowNum;
-	brickColumnCount = colNum;
-	brickWidth = width;
-	brickHeight = height;
-	for(var i=0; i<brickColumnCount; i++){
-		bricks[i] = [];
-		for(var j=0; j<brickRowCount; j++){
-			bricks[i][j] = {x: 0, y: 0};
-		}
-	}
 }
