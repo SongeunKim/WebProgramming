@@ -21,6 +21,18 @@ $(document).ready(function() {
 	$(document).mousemove(function(e) {
 		mouseX = e.pageX - boardLeft;
 	})
+	$(document).click(function(){
+		switch(game.status){
+		case 0:
+			break;
+		case 1:
+			game.status = 2;
+		case 2:
+			//...
+			break;
+		}
+
+	})
 	$(window).resize(function(e) {
 		boardLeft = board.getBoundingClientRect().left;
 	})
@@ -59,9 +71,12 @@ $(document).ready(function() {
 class Game {
 	//생성자
 	constructor() {
-		this.bar = new Bar("src/bar.png", 100, 20, 10); //막대 객체
+		this.bar = new Bar("src/bar.png", 100, 20, 10);
 		this.brick = new Brick(3, 5, 75, 20);
 		this.ball = new Ball();
+		this.score = 0;
+		this.life = 0;
+		this.status = 0;
 		this.interval; //update interval
 		//...
 	}
@@ -69,6 +84,7 @@ class Game {
 	//게임 시작 시 한번 호출되는 함수
 	start() {
 		game.init();
+		setTimeout(() => this.status = 1, 100);
 		this.interval = setInterval(game.update, 10);
 		//...
 	}
@@ -77,25 +93,33 @@ class Game {
 	update() {
 		game.calculate();
 		game.draw();
-		game.ball.collisionDetection(game.brick);
 		//...
 	}
 
 	//게임 종료 시 한번 호출되는 함수
 	stop() {
-		clearInterval(interval);
+		clearInterval(this.interval);
 		//...
 	}
 
 	//게임 환경 초기화 함수
 	init() {
 		boardLeft = board.getBoundingClientRect().left;
+		this.score = 0;
+		this.life = 3;
 		//...
 	}
 
 	//게임 내 수치 계산 함수
 	calculate() {
+		if(this.life == 0) {
+			game.stop();
+			this.status = 0;
+		}
 		this.bar.calculate();
+		if(this.status == 2)
+			this.ball.calculate(this.bar, this.brick);
+		//console.log("life: " + this.life + ", score: " + this.score);
 		//...
 	}
 
@@ -111,13 +135,13 @@ class Game {
 class Bar {
 	//생성자
 	constructor(image, width, height, speed) {
-		this.image = new Image(); //막대 이미지 인스턴스
+		this.image = new Image();
 		this.image.src = image;
-		this.width = width; //너비
-		this.height = height; //높이
-		this.x = 0; //x좌표
-		this.y = boardHeight - this.height*2; //y좌표
-		this.speed = speed; //속도
+		this.width = width;
+		this.height = height;
+		this.x = 0;
+		this.y = boardHeight - this.height*2;
+		this.speed = speed;
 	}
 
 	//위치 계산 함수
@@ -140,46 +164,62 @@ class Ball {
 		this.ballRadius = 10;
 		this.ballX = boardWidth/2;
 		this.ballY = boardHeight/2;
-		this.ballDX = 1;
-		this.ballDY = 1;
+		this.ballDX = 4;
+		this.ballDY = 4;
 	}
+
+	calculate(bar, brick) {
+		//바닥에 닿았을 때
+		if (this.ballY > (boardHeight + this.ballRadius)) {
+			game.status = 1;
+			game.life -= 1;
+			this.ballX = boardWidth/2;
+			this.ballY = boardHeight/2;
+			return;
+		}
+		//외벽 충돌(바닥 제외)
+		if (this.ballX < (0 + this.ballRadius) || this.ballX > (boardWidth-this.ballRadius))
+			this.ballDX = -this.ballDX;
+		if (this.ballY < (0 + this.ballRadius))
+			this.ballDY = -this.ballDY;
+		//막대 충돌
+		if((this.ballY + this.ballRadius > bar.y) && (this.ballY - this.ballRadius < bar.y + bar.height)) {
+			if((this.ballX > bar.x - bar.width/2) && (this.ballX < bar.x + bar.width/2)) {
+				if(this.ballDY > 0)
+					this.ballDY = -this.ballDY
+			}
+		}
+		//벽돌 충돌
+		for (let i = 0; i < brick.brickColumnCount; i++) {
+			for (let q = 0; q < brick.brickRowCount; q++) {
+				let b = brick.bricks[i][q];
+				if(b.durability == 0) continue;
+				if((this.ballY + this.ballRadius >= b.y) && (this.ballY - this.ballRadius <= b.y + brick.brickHeight)) {
+					if((this.ballX >= b.x) && (this.ballX <= b.x + brick.brickWidth))	{
+						brick.bricks[i][q].durability = 0;
+						this.ballDY = -this.ballDY;
+						game.score += 1;
+					}
+				}
+				if((this.ballX + this.ballRadius >= b.x) && (this.ballX - this.ballRadius <= b.x + brick.brickWidth)) {
+					if((this.ballY >= b.y) && (this.ballY <= b.y + brick.brickHeight))	{
+						brick.bricks[i][q].durability = 0;
+						this.ballDX = -this.ballDX;
+						game.score += 1;
+					}
+				}
+			}
+		}
+		this.ballX += this.ballDX;
+		this.ballY += this.ballDY;
+	}
+
 	draw(x, y, width, height){
 		boardCtx.beginPath();
 		boardCtx.fillStyle = "red";
 		boardCtx.arc(this.ballX, this.ballY, this.ballRadius, 0, Math.PI*2, true )
 		boardCtx.closePath();
 		boardCtx.fill();
-		if (this.ballY > (boardHeight + this.ballRadius)){
-			this.ballX = boardWidth/2;
-			this.ballY = boardHeight/2;
-		}
-		if (this.ballX < (0 + this.ballRadius) || this.ballX > (boardWidth-this.ballRadius))
-			this.ballDX = -this.ballDX;
-		if (this.ballY < (0 + this.ballRadius))
-			this.ballDY = -this.ballDY;
-		if((this.ballY + this.ballRadius > y)&&(this.ballY - this.ballRadius < y + height)&&(this.ballX > x - width/2) && (this.ballX < x + width/2)){
-			if(this.ballY + this.ballRadius - this.ballDY > y) {
-				if(x > this.ballX)
-					this.ballX = x - width/2 - this.ballRadius;
-				else
-					this.ballX = x + width/2 + this.ballRadius;
-				this.ballDX = -this.ballDX;
-			}
-			else this.ballDY = -this.ballDY;
-		}
-		this.ballX += this.ballDX;
-		this.ballY += this.ballDY;
-	}
-	collisionDetection(brickObject) {
-		for (let i = 0; i < brickObject.brickColumnCount; i++) {
-			for (let q = 0; q < brickObject.brickRowCount; q++) {
-				let b = brickObject.bricks[i][q];
-				if ((this.ballX > b.x - this.ballRadius && this.ballX < b.x + brickObject.brickWidth + this.ballRadius  && this.ballY > b.y - this.ballRadius && this.ballY < b.y + brickObject.brickHeight + this.ballRadius)&&b.durability!=0) {
-						this.ballDY = -this.ballDY;
-						b.durability--;
-				}
-			}
-		}
 	}
 }
 
