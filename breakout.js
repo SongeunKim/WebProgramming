@@ -128,7 +128,7 @@ class Game {
 		boardCtx.clearRect(0, 0, boardWidth, boardHeight);
 		this.bar.draw();
 		this.brick.draw();
-		this.ball.draw(this.bar.x, this.bar.y, this.bar.width, this.bar.height);
+		this.ball.draw();
 	}
 }
 
@@ -214,7 +214,7 @@ class Ball {
 		this.ballY += this.ballDY;
 	}
 
-	draw(x, y, width, height){
+	draw() {
 		boardCtx.beginPath();
 		boardCtx.fillStyle = "red";
 		boardCtx.arc(this.ballX, this.ballY, this.ballRadius, 0, Math.PI*2, true )
