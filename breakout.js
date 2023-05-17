@@ -190,14 +190,14 @@ class Ball {
 			if (this.angle <= PI)
 				this.angle = PI - this.angle;
 			else
-				this.angle = 3/2*PI - this.angle;
+				this.angle = 3*PI - this.angle;
 		}
 		if ((this.ballY < (0 + this.ballRadius)) && (this.angle < PI)) {
 			this.angle = 2*PI - this.angle;
 		}
 		//막대 충돌
 		if((this.ballY + this.ballRadius > bar.y) && (this.ballY - this.ballRadius < bar.y + bar.height)) {
-			if((this.ballX > bar.x - bar.width/2) && (this.ballX < bar.x + bar.width/2)) {
+			if((this.ballX + this.ballRadius > bar.x - bar.width/2) && (this.ballX - this.ballRadius < bar.x + bar.width/2)) {
 				if(this.angle >= PI) {
 					this.angle = PI/2 - ((this.ballX - bar.x)/(bar.width/2))*PI/3;
 				}
@@ -211,10 +211,7 @@ class Ball {
 				if((this.ballY + this.ballRadius >= b.y) && (this.ballY - this.ballRadius <= b.y + brick.brickHeight)) {
 					if((this.ballX >= b.x) && (this.ballX <= b.x + brick.brickWidth))	{
 						brick.bricks[i][q].durability = 0;
-						if (this.angle <= PI/2 || this.angle >= (PI*3/2))
-							this.angle = 2*PI - this.angle;
-						else
-							this.angle = 3/2*PI - (this.angle - PI/2);
+						this.angle = 2*PI - this.angle;
 						game.score += 1;
 					}
 				}
