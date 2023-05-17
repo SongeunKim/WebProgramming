@@ -73,8 +73,8 @@ class Game {
 	//생성자
 	constructor() {
 		this.bar = new Bar("src/bar.png", 100, 20, 10);
-		this.brick = new Brick(3, 8, 75, 20);
-		this.ball = new Ball(5);
+		this.brick = new Brick("src/brick.png", 3, 8, 75, 20);
+		this.ball = new Ball("src/ball.png", 5);
 		this.score = 0;
 		this.life = 0;
 		this.status = 0;
@@ -161,7 +161,9 @@ class Bar {
 }
 
 class Ball {
-	constructor(speed){
+	constructor(image, speed){
+		this.image = new Image();
+		this.image.src = image;
 		this.ballRadius = 10;
 		this.ballX = boardWidth/2;
 		this.ballY = boardHeight/2;
@@ -227,22 +229,19 @@ class Ball {
 				}
 			}
 		}
-		console.log(this.angle / 2/PI * 360 + "degree");
 		this.ballX += this.speed * Math.cos(this.angle);
 		this.ballY -= this.speed * Math.sin(this.angle);
 	}
 
 	draw() {
-		boardCtx.beginPath();
-		boardCtx.fillStyle = "red";
-		boardCtx.arc(this.ballX, this.ballY, this.ballRadius, 0, Math.PI*2, true )
-		boardCtx.closePath();
-		boardCtx.fill();
+		boardCtx.drawImage(this.image, this.ballX - this.ballRadius, this.ballY - this.ballRadius, 2*this.ballRadius, 2*this.ballRadius);
 	}
 }
 
 class Brick {
-	constructor(rowNum, colNum, width, height){
+	constructor(image, rowNum, colNum, width, height){
+		this.image = new Image();
+		this.image.src = image;
 		this.brickRowCount = rowNum;
 		this.brickColumnCount = colNum;
 		this.brickPadding = 10;
@@ -267,11 +266,8 @@ class Brick {
 				var brickY = (j*(this.brickHeight+this.brickPadding))+this.brickOffsetTop;
 				this.bricks[i][j].x = brickX;
 				this.bricks[i][j].y = brickY;
-				boardCtx.beginPath();
-				boardCtx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
-				boardCtx.fillStyle = "#0095DD";
-				boardCtx.fill();
-				boardCtx.closePath();
+				boardCtx.drawImage(this.image, this.bricks[i][j].x, this.bricks[i][j].y, this.brickWidth, this.brickHeight);
+
 			}
 		}
 	}
