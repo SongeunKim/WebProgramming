@@ -1,10 +1,11 @@
-let mouseX; //현재 마우스 x좌표(board 기준)
-let board; //board element
-let boardCtx; //board context
-let boardLeft; //board 왼쪽 여백 길이
-const boardWidth = 900; //board 너비
-const boardHeight = 600; //board 높이
-let game; //gamemanager
+let mouseX;
+let board;
+let boardCtx;
+let boardLeft;
+const boardWidth = 900;
+const boardHeight = 600;
+let game;
+const PI = Math.PI;
 
 //ready
 $(document).ready(function() {
@@ -72,8 +73,8 @@ class Game {
 	//생성자
 	constructor() {
 		this.bar = new Bar("src/bar.png", 100, 20, 10);
-		this.brick = new Brick(3, 5, 75, 20);
-		this.ball = new Ball();
+		this.brick = new Brick(3, 8, 75, 20);
+		this.ball = new Ball(5);
 		this.score = 0;
 		this.life = 0;
 		this.status = 0;
@@ -160,12 +161,12 @@ class Bar {
 }
 
 class Ball {
-	constructor(){
+	constructor(speed){
 		this.ballRadius = 10;
 		this.ballX = boardWidth/2;
 		this.ballY = boardHeight/2;
-		this.ballDX = 4;
-		this.ballDY = 4;
+		this.angle = PI*3/2;
+		this.speed = speed;
 	}
 
 	calculate(bar, brick) {
@@ -175,18 +176,31 @@ class Ball {
 			game.life -= 1;
 			this.ballX = boardWidth/2;
 			this.ballY = boardHeight/2;
+			this.angle = PI*3/2;
 			return;
 		}
 		//외벽 충돌(바닥 제외)
-		if (this.ballX < (0 + this.ballRadius) || this.ballX > (boardWidth-this.ballRadius))
-			this.ballDX = -this.ballDX;
-		if (this.ballY < (0 + this.ballRadius))
-			this.ballDY = -this.ballDY;
+		if ((this.ballX < (0 + this.ballRadius)) && (Math.cos(this.angle) < 0)) {
+			if (this.angle <= PI)
+				this.angle = PI - this.angle;
+			else
+				this.angle = 3*PI - this.angle;
+		}
+		if ((this.ballX > (boardWidth-this.ballRadius)) && (Math.cos(this.angle) > 0)) {
+			if (this.angle <= PI)
+				this.angle = PI - this.angle;
+			else
+				this.angle = 3/2*PI - this.angle;
+		}
+		if ((this.ballY < (0 + this.ballRadius)) && (this.angle < PI)) {
+			this.angle = 2*PI - this.angle;
+		}
 		//막대 충돌
 		if((this.ballY + this.ballRadius > bar.y) && (this.ballY - this.ballRadius < bar.y + bar.height)) {
 			if((this.ballX > bar.x - bar.width/2) && (this.ballX < bar.x + bar.width/2)) {
-				if(this.ballDY > 0)
-					this.ballDY = -this.ballDY
+				if(this.angle >= PI) {
+					this.angle = PI/2 - ((this.ballX - bar.x)/(bar.width/2))*PI/3;
+				}
 			}
 		}
 		//벽돌 충돌
@@ -197,21 +211,28 @@ class Ball {
 				if((this.ballY + this.ballRadius >= b.y) && (this.ballY - this.ballRadius <= b.y + brick.brickHeight)) {
 					if((this.ballX >= b.x) && (this.ballX <= b.x + brick.brickWidth))	{
 						brick.bricks[i][q].durability = 0;
-						this.ballDY = -this.ballDY;
+						if (this.angle <= PI/2 || this.angle >= (PI*3/2))
+							this.angle = 2*PI - this.angle;
+						else
+							this.angle = 3/2*PI - (this.angle - PI/2);
 						game.score += 1;
 					}
 				}
 				if((this.ballX + this.ballRadius >= b.x) && (this.ballX - this.ballRadius <= b.x + brick.brickWidth)) {
 					if((this.ballY >= b.y) && (this.ballY <= b.y + brick.brickHeight))	{
 						brick.bricks[i][q].durability = 0;
-						this.ballDX = -this.ballDX;
+						if (this.angle <= PI)
+							this.angle = PI - this.angle;
+						else
+							this.angle = 3*PI - this.angle;
 						game.score += 1;
 					}
 				}
 			}
 		}
-		this.ballX += this.ballDX;
-		this.ballY += this.ballDY;
+		console.log(this.angle / 2/PI * 360 + "degree");
+		this.ballX += this.speed * Math.cos(this.angle);
+		this.ballY -= this.speed * Math.sin(this.angle);
 	}
 
 	draw() {
