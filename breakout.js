@@ -1,4 +1,5 @@
 let mouseX;
+let scoreBar;
 let board;
 let boardCtx;
 let boardLeft;
@@ -11,6 +12,7 @@ const PI = Math.PI;
 $(document).ready(function() {
 	//initialize
 	mouseX = 0;
+	scoreBar = $("#score-bar");
 	board = $("#board").get(0);
 	boardCtx = board.getContext("2d");
 	boardLeft = board.getBoundingClientRect().left;
@@ -48,18 +50,21 @@ $(document).ready(function() {
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
+		game.difficulty = 0;
 		game.start();
 	});
 	$("#level-normal").click(function(){
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
+		game.difficulty = 1;
 		game.start();
 	});
 	$("#level-hard").click(function(){
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
+		game.difficulty = 2;
 		game.start();
 	});
 	$("#main-settings-button").click(function(){
@@ -73,11 +78,14 @@ class Game {
 	//생성자
 	constructor() {
 		this.bar = new Bar("src/bar.png", 100, 20, 10);
-		this.brick = new Brick("src/brick.png", 3, 8, 75, 20);
+		this.brick = new Brick("src/block.png", "src/question_block.png", 3, 18, 45, 45, 0, 45, 45);
 		this.ball = new Ball("src/ball.png", 5);
 		this.score = 0;
 		this.life = 0;
-		this.status = 0;
+		this.status = 0; //0: not ready, 1: ready, 2: running
+		this.difficulty = 0; //0: easy, 1: normal, 2: hard
+		this.timer = 0;
+		this.timerPerFrame = 0;
 		this.interval; //update interval
 		//...
 	}
@@ -94,6 +102,7 @@ class Game {
 	update() {
 		game.calculate();
 		game.draw();
+		game.updateScoreBar();
 		//...
 	}
 
@@ -108,19 +117,46 @@ class Game {
 		boardLeft = board.getBoundingClientRect().left;
 		this.score = 0;
 		this.life = 3;
+		switch (this.difficulty) {
+		case 0:
+			this.timer = 999;
+			this.timerPerFrame = 0;
+			this.ball.init(4);
+			this.brick.init(1);
+			break;
+		case 1:
+			this.timer = 180;
+			this.timerPerFrame = 0.01;
+			this.ball.init(5);
+			this.brick.init(1);
+			break;
+		case 2:
+			this.timer = 180;
+			this.timerPerFrame = 0.01;
+			this.ball.init(6);
+			this.brick.init(2);
+			break;
+		default:
+			break;
+		}
 		//...
 	}
 
 	//게임 내 수치 계산 함수
 	calculate() {
+		if(this.timer <= 0) {
+			this.timer = 0;
+			this.life = 0;
+		}
 		if(this.life == 0) {
 			game.stop();
 			this.status = 0;
 		}
 		this.bar.calculate();
-		if(this.status == 2)
+		if(this.status == 2) {
+			this.timer -= this.timerPerFrame;
 			this.ball.calculate(this.bar, this.brick);
-		//console.log("life: " + this.life + ", score: " + this.score);
+		}
 		//...
 	}
 
@@ -130,6 +166,11 @@ class Game {
 		this.bar.draw();
 		this.brick.draw();
 		this.ball.draw();
+	}
+
+	updateScoreBar() {
+		let str = "life: " + this.life + ", score: " + this.score + ", timer: " + parseInt(this.timer);
+		scoreBar.html(str);
 	}
 }
 
@@ -171,6 +212,10 @@ class Ball {
 		this.speed = speed;
 	}
 
+	init(s) {
+		this.speed = s;
+	}
+
 	calculate(bar, brick) {
 		//바닥에 닿았을 때
 		if (this.ballY > (boardHeight + this.ballRadius)) {
@@ -188,7 +233,7 @@ class Ball {
 			else
 				this.angle = 3*PI - this.angle;
 		}
-		if ((this.ballX > (boardWidth-this.ballRadius)) && (Math.cos(this.angle) > 0)) {
+		else if ((this.ballX > (boardWidth-this.ballRadius)) && (Math.cos(this.angle) > 0)) {
 			if (this.angle <= PI)
 				this.angle = PI - this.angle;
 			else
@@ -209,24 +254,23 @@ class Ball {
 		for (let i = 0; i < brick.brickColumnCount; i++) {
 			for (let q = 0; q < brick.brickRowCount; q++) {
 				let b = brick.bricks[i][q];
-				if(b.durability == 0) continue;
+				if(b.durability <= 0) continue;
 				if((this.ballY + this.ballRadius >= b.y) && (this.ballY - this.ballRadius <= b.y + brick.brickHeight)) {
-					if((this.ballX >= b.x) && (this.ballX <= b.x + brick.brickWidth))	{
-						brick.bricks[i][q].durability = 0;
+					if((this.ballX >= b.x) && (this.ballX <= b.x + brick.brickWidth)) {
+						brick.bricks[i][q].durability -= 1;
 						this.angle = 2*PI - this.angle;
-						game.score += 1;
 					}
 				}
 				if((this.ballX + this.ballRadius >= b.x) && (this.ballX - this.ballRadius <= b.x + brick.brickWidth)) {
 					if((this.ballY >= b.y) && (this.ballY <= b.y + brick.brickHeight))	{
-						brick.bricks[i][q].durability = 0;
+						brick.bricks[i][q].durability -= 1;
 						if (this.angle <= PI)
 							this.angle = PI - this.angle;
 						else
 							this.angle = 3*PI - this.angle;
-						game.score += 1;
 					}
 				}
+				if(b.durability <= 0) game.score += 1;
 			}
 		}
 		this.ballX += this.speed * Math.cos(this.angle);
@@ -239,21 +283,26 @@ class Ball {
 }
 
 class Brick {
-	constructor(image, rowNum, colNum, width, height){
-		this.image = new Image();
-		this.image.src = image;
+	constructor(image1, image2, rowNum, colNum, width, height, padding, left, top){
+		this.image1 = new Image();
+		this.image1.src = image1;
+		this.image2 = new Image();
+		this.image2.src = image2;
 		this.brickRowCount = rowNum;
 		this.brickColumnCount = colNum;
-		this.brickPadding = 10;
-		this.brickOffsetTop = 30;
-		this.brickOffsetLeft = 30;
+		this.brickPadding = padding;
+		this.brickOffsetLeft = left;
+		this.brickOffsetTop = top;
 		this.brickWidth = width;
 		this.brickHeight = height;
 		this.bricks = [];
+	}
+
+	init(d) {
 		for(var i=0; i<this.brickColumnCount; i++){
 			this.bricks[i] = [];
 			for(var j=0; j<this.brickRowCount; j++){
-				this.bricks[i][j] = {x: 0, y: 0, durability: 1};
+				this.bricks[i][j] = {x: 0, y: 0, durability: d};
 			}
 		}	
 	}
@@ -261,13 +310,15 @@ class Brick {
 	draw(){
 		for(var i=0; i<this.brickColumnCount; i++){
 			for(var j=0; j<this.brickRowCount; j++){
-				if(this.bricks[i][j].durability == 0) continue;
+				if(this.bricks[i][j].durability <= 0) continue;
 				var brickX = (i*(this.brickWidth+this.brickPadding))+this.brickOffsetLeft;
 				var brickY = (j*(this.brickHeight+this.brickPadding))+this.brickOffsetTop;
 				this.bricks[i][j].x = brickX;
 				this.bricks[i][j].y = brickY;
-				boardCtx.drawImage(this.image, this.bricks[i][j].x, this.bricks[i][j].y, this.brickWidth, this.brickHeight);
-
+				if(this.bricks[i][j].durability == 2)
+					boardCtx.drawImage(this.image2, this.bricks[i][j].x, this.bricks[i][j].y, this.brickWidth, this.brickHeight);
+				if(this.bricks[i][j].durability == 1)
+					boardCtx.drawImage(this.image1, this.bricks[i][j].x, this.bricks[i][j].y, this.brickWidth, this.brickHeight);
 			}
 		}
 	}

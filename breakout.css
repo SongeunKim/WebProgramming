@@ -50,6 +50,7 @@ body {
 #score-bar{
 	width: 900px;
 	height: 80px;
+	background-color: #999999;
 }
 
 #board{
