@@ -78,8 +78,9 @@ class Game {
 	//생성자
 	constructor() {
 		this.bar = new Bar("src/bar.png", 100, 20, 10);
-		this.brick = new Brick("src/block.png", "src/question_block.png", 3, 18, 45, 45, 0, 45, 45);
+		this.brick = new Brick("src/block.png", "src/block2.png", 3, 18, 45, 45, 0, 45, 45);
 		this.ball = new Ball("src/ball.png", 5);
+		this.star = new Star("src/star.png", 50, 50, 100, 100, 2, -5);
 		this.score = 0;
 		this.life = 0;
 		this.status = 0; //0: not ready, 1: ready, 2: running
@@ -156,6 +157,7 @@ class Game {
 		if(this.status == 2) {
 			this.timer -= this.timerPerFrame;
 			this.ball.calculate(this.bar, this.brick);
+			this.star.calculate();
 		}
 		//...
 	}
@@ -166,6 +168,7 @@ class Game {
 		this.bar.draw();
 		this.brick.draw();
 		this.ball.draw();
+		this.star.draw();
 	}
 
 	updateScoreBar() {
@@ -298,13 +301,18 @@ class Brick {
 		this.bricks = [];
 	}
 
-	init(d) {
+	init(d, n) {
 		for(var i=0; i<this.brickColumnCount; i++){
 			this.bricks[i] = [];
 			for(var j=0; j<this.brickRowCount; j++){
-				this.bricks[i][j] = {x: 0, y: 0, durability: d};
+				this.bricks[i][j] = {x: 0, y: 0, durability: d, item: 0};
 			}
-		}	
+		}
+		for(var i=0; i<n; i++) {
+			this.bricks[Math.floor(Math.random()*(this.brickColumnCount+1))]
+			[Math.floor(Math.random()*(this.brickRowCount+1))].item 
+			= Math.floor(Math.random()*2 + 1);
+		}
 	}
 	
 	draw(){
@@ -321,6 +329,48 @@ class Brick {
 					boardCtx.drawImage(this.image1, this.bricks[i][j].x, this.bricks[i][j].y, this.brickWidth, this.brickHeight);
 			}
 		}
+	}
+}
+
+class Item {
+	constructor(image, width, height, x, y, speed, jumpPower) {
+		this.image = new Image();
+		this.image.src = image;
+		this.lifetime = 5000;
+		this.gravity = 0.05;
+		this.width = width;
+		this.height = height;
+		this.x = x;
+		this.y = y;
+		this.dx = speed;
+		this.dy = jumpPower/4;
+		this.jumpPower = jumpPower;
+	}
+
+	calculate() {
+		if ((this.x + this.width > boardWidth)&&(this.dx > 0))
+			this.dx = -this.dx;
+		else if ((this.x < 0)&&(this.dx < 0))
+			this.dx = -this.dx;
+		if (((this.y + this.height > boardHeight)&&(this.dy > 0)))
+			this.dy = this.jumpPower;
+		this.dy += this.gravity;
+		this.x += this.dx;
+		this.y += this.dy;
+	}
+
+	draw() {
+		boardCtx.drawImage(this.image, this.x, this.y, this.width, this.height);
+	}
+}
+
+class Mushuroom extends Item {
+
+}
+
+class Star extends Item {
+	constructor(image, width, height, x, y, speed, jumpPower) {
+		super(image, width, height, x, y, speed, jumpPower);
 	}
 }
 
