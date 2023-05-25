@@ -7,6 +7,16 @@ body {
 	margin: 0px auto;
 }
 
+@font-face {
+    font-family: 'mario';
+    src: url('src/font/SuperMarioBros.otf') format('truetype');
+}
+
+@font-face {
+	font-family: 'pixel';
+	src: url('src/font/SuperMarioWorldTextBox.ttf') format('truetype');
+}
+
 #main-div {
 	width: 900px;
 	height: 700px;
@@ -30,12 +40,16 @@ body {
 }
 
 #main-start-button {
-	margin: 100px 400px;
-	width: 100px;
+	margin: 100px 300px;
+	width: 300px;
 	height: 50px;
 	text-align: center;
 	line-height: 50px;
-	border: 1px solid black;
+/*	border: 1px solid black;*/
+	font-family: 'mario', serif;
+	font-size: 60px;
+	color: white;
+	text-shadow: -3px 0px black, 0px 3px black, 3px 0px black, 0px -3px black;
 }
 
 #main-settings-button {
@@ -44,8 +58,14 @@ body {
 	height: 50px;
 	text-align: center;
 	line-height: 50px;
-	border: 1px solid black;
+/*	border: 1px solid black;*/
 
+}
+
+#main-settings-button img {
+	width: 100px;
+	height: 50px;
+	object-fit: contain;
 }
 
 #canvas-wrapper {
@@ -59,6 +79,13 @@ body {
 	width: 900px;
 	height: 80px;
 	background-color: #999999;
+
+/*	margin: 0px 10px;*/
+	text-align: left;
+	font-family: 'pixel';
+	color: white;
+	text-shadow: -3px 0px black, 0px 3px black, 3px 0px black, 0px -3px black;
+	font-size: 20px;
 }
 
 #board{
@@ -80,6 +107,10 @@ body {
 	height: 400px;
 	background-color: rgb(244, 234, 92);
 	border-radius: 10%;
+
+	font-family: 'mario', serif;
+	color: white;
+	text-shadow: -3px 0px black, 0px 3px black, 3px 0px black, 0px -3px black;
 }
 
 .popup-title {
@@ -101,3 +132,6 @@ body {
 	border: 1px solid black;
 }
 
+#level-title {
+	font-size: 60px;
+}
