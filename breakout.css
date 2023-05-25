@@ -25,12 +25,12 @@ body {
 }
 
 #main-blank {
-	height: 150px;
+	height: 100px;
 }
 
 #main-title {
 	width: 900px;
-	height: 150px;
+	height: 200px;
 	text-align: center;
 	line-height: 100px;
 	font-size: 100px;
