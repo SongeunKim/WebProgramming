@@ -96,7 +96,7 @@ body {
 .popup {
 	text-align: center;
 	font-size: 40px;
-	line-height: 100px;
+	line-height: 90px;
 	display: none;
 	position: fixed;
 	top:0;
@@ -116,10 +116,10 @@ body {
 .popup-title {
 	margin: 0px 0px 40px 0px;
 	width: 500px;
-	height: 100px;
+	height: 80px;
 	text-align: center;
-	line-height: 100px;
-	font-size: 35px;
+	line-height: 180px;
+	font-size: 60px;
 /*	padding: 50px auto;*/
 }
 

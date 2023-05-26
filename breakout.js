@@ -71,11 +71,7 @@ $(document).ready(function() {
 		$("#settings").css("display", "block");
 		popUp($("#settings"));
 	});
-	$("#main-div").click(function(){
-		if($("#settings").css("display")=="block"){
-			$("#settings").css("display", "none");
-		}
-	});
+	
 	//...
 });
 
