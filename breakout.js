@@ -50,6 +50,7 @@ $(document).ready(function() {
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
+		$("#board").css("background-image", "url(src/background1.jpg)")
 		game.difficulty = 0;
 		game.start();
 	});
@@ -57,6 +58,7 @@ $(document).ready(function() {
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
+		$("#board").css("background-image", "url(src/background2.jpg)")
 		game.difficulty = 1;
 		game.start();
 	});
@@ -64,6 +66,7 @@ $(document).ready(function() {
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
+		$("#board").css("background-image", "url(src/background3.jpg)")
 		game.difficulty = 2;
 		game.start();
 	});

@@ -91,6 +91,7 @@ body {
 #board{
 	width: 900px;
 	height: 600px;
+	background-size: cover;
 }
 
 .popup {
@@ -135,3 +136,4 @@ body {
 #level-title {
 	font-size: 60px;
 }
+
