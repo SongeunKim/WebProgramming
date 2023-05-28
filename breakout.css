@@ -76,12 +76,13 @@ body {
 }
 
 #score-bar{
-	width: 900px;
+	width: 850px;
 	height: 80px;
 	background-color: #999999;
 
-/*	margin: 0px 10px;*/
+	padding: 0px 25px;
 	text-align: left;
+	line-height: 80px;
 	font-family: 'pixel';
 	color: white;
 	text-shadow: -3px 0px black, 0px 3px black, 3px 0px black, 0px -3px black;
