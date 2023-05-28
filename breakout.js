@@ -7,6 +7,8 @@ const boardWidth = 900;
 const boardHeight = 600;
 let game;
 const PI = Math.PI;
+var vd;
+var ad;
 
 //ready
 $(document).ready(function() {
@@ -19,6 +21,8 @@ $(document).ready(function() {
 	board.width = boardWidth;
 	board.height = boardHeight;
 	game = new Game();
+	vd = $("video");
+	ad = $("#audio");
 
 	//events
 	$(document).mousemove(function(e) {
@@ -43,10 +47,34 @@ $(document).ready(function() {
 
 	//event handlers
 	$("#main-start-button").click(function() {
-		$("#level").css("display", "block");
-		popUp($("#level"));
+		$("#main-div").hide();		
+		$("#prologue-video").css("display", "block");
+		ad.get(0).pause();
+		vd.get(0).play();
+		let interval = setInterval(function() {
+			if(vd.prop("ended")) {
+				$("#prologue-video").hide();
+				$("#prologue-text").css("display", "block");
+				setTimeout(function() {
+					$("#text1").fadeOut(500);
+					setTimeout(function() {
+						$("#text2").fadeIn(500);
+						setTimeout(function() {
+							$("#prologue-text").fadeOut(1000);
+							setTimeout(function() {
+								$("#level").css("display", "block");
+								popUp($("#level"));
+							}, 1000);
+						}, 4000);
+					}, 1000);
+				}, 4000);
+				clearInterval(interval);
+			}
+		}, 200);
 	});
 	$("#level-easy").click(function(){
+		ad.src = "src/audio/easy_mode.mp3";
+		ad.get(0).play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
@@ -55,6 +83,8 @@ $(document).ready(function() {
 		game.start();
 	});
 	$("#level-normal").click(function(){
+		ad.src = "src/audio/normal_mode.mp3";
+		ad.get(0).play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
@@ -63,6 +93,8 @@ $(document).ready(function() {
 		game.start();
 	});
 	$("#level-hard").click(function(){
+		ad.src = "src/audio/hard_mode.mp3";
+		ad.get(0).play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		$("#canvas-wrapper").css("display", "block");
