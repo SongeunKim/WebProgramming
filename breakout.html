@@ -41,29 +41,41 @@
 			<div id="level-hard" class="level-button">hard</div>
 		</div>
 
-		<!-- 설정창 -->
+			<!-- 설정창 -->
 		<div id="settings" class="popup">
 			<div id="settings-title" class="popup-title">setting</div>
 			<!-- 설정에 들어갈 것들 -->
-			<div id="setting" class="setting-button">ball</div>
-			<div id="setting" class="setting-button">bar</div>
-			<div id="setting" class="setting-button">sound</div>
+			<label for = "ball_image" class="setting-button">ball</label>
+			<select id = "ball_image">
+				<option value="제목" selected>공 외형 선택</option>
+				<option value=""></option>
+				<option value=""></option>
+				<option value=""></option>
+				<option value=""></option>
+			</select>
+			<label for = "bar_image" class="setting-button">bar</label>
+			<select id = "bar_image">
+				<option value="제목" selected>바 외형 선택</option>
+				<option value="src/bar.png">바</option>
+				<option value="src/brick.png">바2</option>
+				<option value=""></option>
+				<option value=""></option>
+			</select>
+			<label for = "background_music" class="setting-button">sound</label>
+			<select id = "background_music">
+				<option value="제목">게임 배경음악 변경</option>
+				<option value="src/audio/easy_mode.mp3" selected>노래1</option>
+				<option value="src/audio/normal_mode.mp3">노래2</option>
+				<option value="src/audio/hard_mode.mp3">노래3</option>
+				<option value=""></option>
+			</select>
 		</div>
 
-		<!-- 설정창 1. 볼 -->
-		<div id="ball-setting" class="popup">
-			<div id="settings-title">ball</div>
-			<!-- 설정에 들어갈 것들 -->
-		</div>
-		<!-- 설정창 2. 바 -->
-		<div id="bar-setting" class="popup">
-			<div id="settings-title">bar</div>
-			<!-- 설정에 들어갈 것들 -->
-		</div>
-		<!-- 설정창 3. 사운드 -->
-		<div id="sound-setting" class="popup">
-			<div id="settings-title" class="popup-title">sound</div>
-			<!-- 설정에 들어갈 것들 -->
+		<div id="pause" class="popup">
+			<div id="pause-title">pause</div>
+			<div id="resume">resume</div>
+			<div id="back_to_title">title</div>
+			<div id="setting_menu">setting</div>
 		</div>
 
 		<!-- 게임 플레이 후 결과 창(WIN / LOSE) -->

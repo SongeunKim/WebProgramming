@@ -159,3 +159,16 @@ body {
 }
 
 #text2 { display: none; }
+
+select{
+	padding: 10px 5px;
+	background: #fc0;
+	border-radius: 9px;
+	outline: 0;
+	appearance: none;
+}
+
+option{
+	background: #fc0;
+	color: black;
+}

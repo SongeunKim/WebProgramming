@@ -25,6 +25,22 @@ $(document).ready(function() {
 	ad = $("#audio");
 
 	//events
+	document.addEventListener('keydown',(e)=>{
+		if(e.key=='Escape'){
+			if($("#level").css("display","block")){
+				$("#level").css("display","none");
+			}
+			if($("#settings").css("display", "block")){
+				$("#settings").css("display", "none");
+			}
+			if(game.status == 2){
+				game.status = 3;
+				game.audio.pause();
+				$("#pause").css("display", "block");
+				popUp($("#pause"));
+			}
+		}
+	});
 	$(document).mousemove(function(e) {
 		mouseX = e.pageX - boardLeft;
 	})
@@ -46,6 +62,35 @@ $(document).ready(function() {
 	//...
 
 	//event handlers
+	$("#bar_image").on("change",function(){
+		if($(this).val()!="제목")
+			game.bar.image.src = $(this).val();
+	});
+	$("#ball_image").on("change",function(){
+		if($(this).val()!="제목")
+			game.ball.image.src = $(this).val();
+	});
+	$("#background_music").on("change",function(){
+		if($(this).val()!="제목"){
+			var source = $(this).val();
+			var loop = true;
+			game.setMusic(source, loop)
+		}
+	});
+	$("#resume").click(function(){
+		$("#pause").css("display", "none");
+		game.status = 1;
+		game.audio.play();
+		game.interval = setInterval(game.update, 10);
+	});
+	$("#back_to_title").click(function(){
+		$("#pause").css("display", "none");
+		$("#canvas-wrapper").hide();
+		$("#main-div").show();
+		game.audio.pause();
+		game.status = 0;
+		game.stop();
+	});
 	$("#main-start-button").click(function() {
 		$("#main-div").hide();		
 		$("#prologue-video").css("display", "block");
@@ -117,6 +162,7 @@ class Game {
 		this.brick = new Brick("src/block.png", "src/block2.png", "src/question_block.png", 3, 18, 45, 45, 0, 45, 45);
 		this.ball = new Ball("src/ball.png", "src/ball_invinc.png", 5);
 		this.items = new Items();
+		this.audio = new Audio();
 		this.score = 0;
 		this.life = 0;
 		this.status = 0; //0: not ready, 1: ready, 2: running
@@ -130,6 +176,7 @@ class Game {
 	//게임 시작 시 한번 호출되는 함수
 	start() {
 		game.init();
+		this.audio.play();
 		setTimeout(() => this.status = 1, 100);
 		this.interval = setInterval(game.update, 10);
 		//...
@@ -146,6 +193,8 @@ class Game {
 	//게임 종료 시 한번 호출되는 함수
 	stop() {
 		clearInterval(this.interval);
+		game.ball.ballX = boardWidth/2;
+		game.ball.ballY = boardHeight/2;
 		//...
 	}
 
@@ -157,18 +206,21 @@ class Game {
 		this.bar.init(100);
 		switch (this.difficulty) {
 		case 0:
+			game.setMusic('src/audio/easy_mode.mp3', true);
 			this.timer = 999;
 			this.timerPerFrame = 0;
 			this.ball.init(4);
 			this.brick.init(1);
 			break;
 		case 1:
+			game.setMusic('src/audio/normal_mode.mp3', true);
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(5);
 			this.brick.init(1);
 			break;
 		case 2:
+			game.setMusic('src/audio/hard_mode.mp3', true);
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(6);
@@ -189,6 +241,9 @@ class Game {
 		if(this.life == 0) {
 			game.stop();
 			this.status = 0;
+		}
+		if(this.status == 3){
+			game.stop();
 		}
 		this.bar.calculate();
 		if(this.status == 2) {
@@ -211,6 +266,11 @@ class Game {
 	updateScoreBar() {
 		let str = "life: " + this.life + ", score: " + this.score + ", timer: " + parseInt(this.timer);
 		scoreBar.html(str);
+	}
+	
+	setMusic(source, loop){
+		this.audio.src = source;
+		this.audio.loop = loop;
 	}
 }
 
