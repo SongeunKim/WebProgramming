@@ -72,6 +72,7 @@ $(document).ready(function() {
 	$(window).resize(function(e) {
 		boardLeft = board.getBoundingClientRect().left;
 	})
+	
 	//...
 
 	//event handlers
@@ -176,6 +177,25 @@ $(document).ready(function() {
 		
 	});
 	
+	$(".result-home").click(function(){
+		$("#result").css("display", "none");
+		$("#canvas-wrapper").css("display", "none");
+		$("#main-div").show();
+		if(muted==0){
+			bgm.play();
+		}
+	});
+	$(".result-button").click(function(){
+		if($("#result-title").text == "game over"){
+			$("#result").css("display", "none");
+			game.start();
+		}
+		else{
+			game.difficulty+=1;
+			game.start();
+		}
+	});
+
 	$("#prologue-skip").click(function() {
 
 		$("#prologue-video").fadeOut(1000);
@@ -228,6 +248,12 @@ class Game {
 	stop() {
 		clearInterval(this.interval);
 		game.audio.pause();
+		$("#result").css("display", "block");
+		if (this.score > this.brick.brickColumnCount*this.brick.brickRowCount){
+			$("#result-title").html("game clear");
+			$("result-button").html("NEXT LEVEL");
+		}
+		$("#result").css("display", "block");
 		//...
 	}
 
