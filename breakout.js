@@ -125,7 +125,7 @@ $(document).ready(function() {
 		popUp($("#settings"));
 	});
 	
-	("#prologue-skip").click(function() {
+	$("#prologue-skip").click(function() {
 
 		$("#prologue-video").fadeOut(1000);
 		setTimeout(function() {
