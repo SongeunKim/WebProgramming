@@ -25,6 +25,7 @@ $(document).ready(function() {
 	game = new Game();
 	bgm = new Audio();
 	bgm.src = "src/audio/title_screen.mp3";
+	bgm.autoplay = true;
 	bgm.loop = true;
 	vd = $("video");
 	
@@ -110,7 +111,7 @@ $(document).ready(function() {
 	$("#main-start-button").click(function() {
 		$("#main-div").hide();		
 		$("#prologue-video").css("display", "block");
-		bgm.get(0).pause();
+		bgm.pause();
 		vd.get(0).play();
 		let interval = setInterval(function() {
 			if(vd.prop("ended")) {
@@ -165,13 +166,13 @@ $(document).ready(function() {
 		popUp($("#settings"));
 	});
 	$("#sound-button").click(function(){
-		if(muted==1){
+		if(muted==0){
 			$("#sound-button img").attr('src', 'src/sound.png')
-			muted = 0;
+			muted = 1;
 			bgm.play();
 		}else{
 			$("#sound-button img").attr('src', 'src/no_sound.png')
-			muted = 1;
+			muted = 0;
 			bgm.pause();
 		}
 		
@@ -181,7 +182,8 @@ $(document).ready(function() {
 		$("#result").css("display", "none");
 		$("#canvas-wrapper").css("display", "none");
 		$("#main-div").show();
-		if(muted==0){
+		if(muted==1){
+			bgm.currentTime = "0";
 			bgm.play();
 		}
 	});
