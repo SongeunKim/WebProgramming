@@ -8,8 +8,9 @@ const boardHeight = 600;
 let game;
 const PI = Math.PI;
 var vd;
-var ad;
+var bgm;
 var snd;
+let muted = 1;
 
 //ready
 $(document).ready(function() {
@@ -22,8 +23,11 @@ $(document).ready(function() {
 	board.width = boardWidth;
 	board.height = boardHeight;
 	game = new Game();
+	bgm = new Audio();
+	bgm.src = "src/audio/title_screen.mp3";
+	bgm.loop = true;
 	vd = $("video");
-	ad = $("#audio");
+	
 
 	//functions
 	function helpPopup(){
@@ -34,6 +38,22 @@ $(document).ready(function() {
 	}
 
 	//events
+	document.addEventListener('keydown',(e)=>{
+		if(e.key=='Escape'){
+			if($("#level").css("display","block")){
+				$("#level").css("display","none");
+			}
+			if($("#settings").css("display", "block")){
+				$("#settings").css("display", "none");
+			}
+			if(game.status == 2){
+				game.status = 3;
+				game.audio.pause();
+				$("#pause").css("display", "block");
+				popUp($("#pause"));
+			}
+		}
+	});
 	$(document).mousemove(function(e) {
 		mouseX = e.pageX - boardLeft;
 	})
@@ -56,10 +76,41 @@ $(document).ready(function() {
 	//...
 
 	//event handlers
+	$("#bar_image").on("change",function(){
+		if($(this).val()!="제목")
+			game.bar.image.src = $(this).val();
+	});
+	$("#ball_image").on("change",function(){
+		if($(this).val()!="제목")
+			game.ball.image.src = $(this).val();
+	});
+	$("#background_music").on("change",function(){
+		if($(this).val()!="제목"){
+			var source = $(this).val();
+			var loop = true;
+			game.setMusic(source, loop)
+		}
+	});
+	$("#resume").click(function(){
+		$("#pause").css("display", "none");
+		game.status = 1;
+		game.audio.play();
+		game.interval = setInterval(game.update, 10);
+	});
+	$("#back_to_title").click(function(){
+		$("#pause").css("display", "none");
+		$("#canvas-wrapper").hide();
+		$("#main-div").show();
+		game.status = 0;
+		game.stop();
+		if(muted==0){
+			bgm.play();
+		}
+	});
 	$("#main-start-button").click(function() {
 		$("#main-div").hide();		
 		$("#prologue-video").css("display", "block");
-		ad.get(0).pause();
+		bgm.get(0).pause();
 		vd.get(0).play();
 		let interval = setInterval(function() {
 			if(vd.prop("ended")) {
@@ -83,10 +134,6 @@ $(document).ready(function() {
 		}, 200);
 	});
 	$("#level-easy").click(function(){
-		ad = new Audio("src/audio/easy_mode.mp3");
-		// ad.autoplay = true;
-		ad.loop = true;
-		ad.play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		helpPopup();
@@ -96,10 +143,6 @@ $(document).ready(function() {
 		game.start();
 	});
 	$("#level-normal").click(function(){
-		ad = new Audio("src/audio/normal_mode.mp3");
-		// ad.autoplay = true;
-		ad.loop = true;
-		ad.play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		helpPopup();
@@ -109,10 +152,6 @@ $(document).ready(function() {
 		game.start();
 	});
 	$("#level-hard").click(function(){
-		ad = new Audio("src/audio/hard_mode.mp3");
-		// ad.autoplay = true;
-		ad.loop = true;
-		ad.play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		helpPopup();
@@ -125,10 +164,26 @@ $(document).ready(function() {
 		$("#settings").css("display", "block");
 		popUp($("#settings"));
 	});
+	$("#sound-button").click(function(){
+		if(muted==1){
+			$("#sound-button img").attr('src', 'src/sound.png')
+			muted = 0;
+			bgm.play();
+		}else{
+			$("#sound-button img").attr('src', 'src/no_sound.png')
+			muted = 1;
+			bgm.pause();
+		}
+		
+	});
+	
 	$(".result-home").click(function(){
 		$("#result").css("display", "none");
 		$("#canvas-wrapper").css("display", "none");
 		$("#main-div").show();
+		if(muted==0){
+			bgm.play();
+		}
 	});
 	$(".result-button").click(function(){
 		if($("#result-title").text == "game over"){
@@ -140,6 +195,7 @@ $(document).ready(function() {
 			game.start();
 		}
 	});
+
 	$("#prologue-skip").click(function() {
 
 		$("#prologue-video").fadeOut(1000);
@@ -159,6 +215,7 @@ class Game {
 		this.brick = new Brick("src/block.png", "src/block2.png", "src/question_block.png", 3, 18, 45, 45, 0, 45, 45);
 		this.ball = new Ball("src/ball.png", "src/ball_invinc.png", 5);
 		this.items = new Items();
+		this.audio = new Audio();
 		this.score = 0;
 		this.life = 0;
 		this.status = 0; //0: not ready, 1: ready, 2: running
@@ -172,6 +229,8 @@ class Game {
 	//게임 시작 시 한번 호출되는 함수
 	start() {
 		game.init();
+		bgm.pause();
+		this.audio.play();
 		setTimeout(() => this.status = 1, 100);
 		this.interval = setInterval(game.update, 10);
 		//...
@@ -188,6 +247,7 @@ class Game {
 	//게임 종료 시 한번 호출되는 함수
 	stop() {
 		clearInterval(this.interval);
+		game.audio.pause();
 		$("#result").css("display", "block");
 		if (this.score > this.brick.brickColumnCount*this.brick.brickRowCount){
 			$("#result-title").html("game clear");
@@ -205,18 +265,21 @@ class Game {
 		this.bar.init(100);
 		switch (this.difficulty) {
 		case 0:
+			game.setMusic('src/audio/easy_mode.mp3', true);
 			this.timer = 999;
 			this.timerPerFrame = 0;
 			this.ball.init(4);
 			this.brick.init(1);
 			break;
 		case 1:
+			game.setMusic('src/audio/normal_mode.mp3', true);
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(5);
 			this.brick.init(1);
 			break;
 		case 2:
+			game.setMusic('src/audio/hard_mode.mp3', true);
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(6);
@@ -237,6 +300,9 @@ class Game {
 		if(this.life == 0) {
 			game.stop();
 			this.status = 0;
+		}
+		if(this.status == 3){
+			game.stop();
 		}
 		this.bar.calculate();
 		if(this.status == 2) {
@@ -261,6 +327,11 @@ class Game {
 		if(this.difficulty != 0)
 			str += ", timer: " + parseInt(this.timer);
 		scoreBar.html(str);
+	}
+
+	setMusic(source, loop, volume){
+		this.audio.src = source;
+		this.audio.loop = loop;
 	}
 }
 
