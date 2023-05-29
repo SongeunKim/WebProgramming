@@ -140,10 +140,21 @@ body {
 
 #prologue-video {
 	width: 900px;
-	height: 500px;
+	height: 600px;
 	background-color: black;
 	display: none;
-	padding: 100px 0px;
+	padding: 100px 0px 0px 0px;
+}
+
+#prologue-skip {
+	width: 150px;
+	height: 30px;
+	padding: 25px 0px 35px 750px;
+	background-color: black;		
+	text-align: center;
+	font-family: 'pixel';
+	color: white;
+	font-size: 30px;
 }
 
 #prologue-text {
