@@ -125,6 +125,15 @@ $(document).ready(function() {
 		popUp($("#settings"));
 	});
 	
+	("#prologue-skip").click(function() {
+
+		$("#prologue-video").fadeOut(1000);
+		setTimeout(function() {
+			vd.get(0).pause();
+			$("#level").css("display", "block");
+			popUp($("#level"));
+		}, 1500);
+	});
 	//...
 });
 
