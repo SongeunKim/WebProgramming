@@ -45,9 +45,15 @@ $(document).ready(function() {
 				$("#level").css("display","none");
 			}
 			if($("#settings").css("display", "block")){
+				if(game.status == 0) {
+					$("#main-div").show();
+					if(muted==0){
+						bgm.play();
+					}
+				}
 				$("#settings").css("display", "none");
 			}
-			if(game.status == 2){
+			if(game.status == 2 || game.status == 1){
 				game.status = 3;
 				game.audio.pause();
 				$("#pause").css("display", "block");
@@ -189,13 +195,16 @@ $(document).ready(function() {
 		}
 	});
 	$(".result-button").click(function(){
-		if($("#result-title").text == "game over"){
+		if(game.score < game.brick.brickColumnCount*game.brick.brickRowCount){
 			$("#result").css("display", "none");
 			game.start();
 		}
 		else{
 			game.difficulty+=1;
 			game.start();
+			$("#result-title").html("game over");
+			$(".result-button").html("RETRY");
+			$("#result").css("display", "none");
 		}
 	});
 
@@ -251,12 +260,10 @@ class Game {
 	stop() {
 		clearInterval(this.interval);
 		game.audio.pause();
-		$("#result").css("display", "block");
-		if (this.score > this.brick.brickColumnCount*this.brick.brickRowCount){
-			$("#result-title").html("game clear");
-			$("result-button").html("NEXT LEVEL");
+		if(this.life <= 0 || this.timer <= 0)
+		{
+			$("#result").css("display", "block");
 		}
-		$("#result").css("display", "block");
 		//...
 	}
 
@@ -305,6 +312,12 @@ class Game {
 			this.status = 0;
 		}
 		if(this.status == 3){
+			game.stop();
+		}
+		if (this.score >= this.brick.brickColumnCount*this.brick.brickRowCount){
+			$("#result").css("display", "block");
+			$("#result-title").html("game clear");
+			$(".result-button").html("NEXT LEVEL");
 			game.stop();
 		}
 		this.bar.calculate();
@@ -384,6 +397,9 @@ class Ball {
 	}
 
 	init(s) {
+		this.ballX = boardWidth/2;
+		this.ballY = boardHeight/2;
+		this.angle = PI*3/2;
 		this.speed = s;
 	}
 
@@ -556,6 +572,9 @@ class Items {
 		{
 			brick.bricks[this.randList[2].x][this.randList[2].y].item = 0;
 		}
+		for(let i = 0; i < 4; i++) {
+			this.itemList[i].init();
+		}
 	}
 
 	calculate(bar) {
@@ -581,8 +600,14 @@ class Item {
 		this.dy = jumpPower/4;
 		this.brickX = 0;
 		this.brickY = 0;
+		this.speed = speed;
 		this.jumpPower = jumpPower;
 		this.durability = 0;
+	}
+
+	init() {
+		this.dx = this.speed;
+		this.dy = this.jumpPower/4;
 	}
 
 	calculate(bar) {
