@@ -112,6 +112,7 @@ $(document).ready(function() {
 		$("#main-div").hide();		
 		$("#prologue-video").css("display", "block");
 		bgm.pause();
+		vd.get(0).currentTime = "0";
 		vd.get(0).play();
 		let interval = setInterval(function() {
 			if(vd.prop("ended")) {
