@@ -216,7 +216,9 @@ class Game {
 	}
 
 	updateScoreBar() {
-		let str = "life: " + this.life + ", score: " + this.score + ", timer: " + parseInt(this.timer);
+		let str = "life: " + this.life + ", score: " + this.score;
+		if(this.difficulty != 0)
+			str += ", timer: " + parseInt(this.timer);
 		scoreBar.html(str);
 	}
 }
@@ -435,8 +437,10 @@ class Items {
 			this.itemList[i].x = brick.bricks[this.randList[i].x][this.randList[i].y].x;
 			this.itemList[i].y = brick.bricks[this.randList[i].x][this.randList[i].y].y;
 		}
-		console.log(brick.bricks[this.randList[0].x][this.randList[0].y].x + ", " + brick.bricks[this.randList[0].x][this.randList[0].y].y);
-		console.log(this.itemList[0].x + ", " + this.itemList[0].y);
+		if(game.difficulty == 0)
+		{
+			brick.bricks[this.randList[2].x][this.randList[2].y].item = 0;
+		}
 	}
 
 	calculate(bar) {
@@ -532,6 +536,8 @@ class FireFlower extends Item {
 		snd = new Audio("src/audio/powerup.mp3");
 		snd.volume = 0.5;
 		snd.play();
+
+		game.timer += 30;
 	}
 }
 
