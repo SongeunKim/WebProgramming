@@ -9,6 +9,7 @@ let game;
 const PI = Math.PI;
 var vd;
 var ad;
+var snd;
 
 //ready
 $(document).ready(function() {
@@ -33,22 +34,6 @@ $(document).ready(function() {
 	}
 
 	//events
-	document.addEventListener('keydown',(e)=>{
-		if(e.key=='Escape'){
-			if($("#level").css("display","block")){
-				$("#level").css("display","none");
-			}
-			if($("#settings").css("display", "block")){
-				$("#settings").css("display", "none");
-			}
-			if(game.status == 2){
-				game.status = 3;
-				game.audio.pause();
-				$("#pause").css("display", "block");
-				popUp($("#pause"));
-			}
-		}
-	});
 	$(document).mousemove(function(e) {
 		mouseX = e.pageX - boardLeft;
 	})
@@ -70,35 +55,6 @@ $(document).ready(function() {
 	//...
 
 	//event handlers
-	$("#bar_image").on("change",function(){
-		if($(this).val()!="제목")
-			game.bar.image.src = $(this).val();
-	});
-	$("#ball_image").on("change",function(){
-		if($(this).val()!="제목")
-			game.ball.image.src = $(this).val();
-	});
-	$("#background_music").on("change",function(){
-		if($(this).val()!="제목"){
-			var source = $(this).val();
-			var loop = true;
-			game.setMusic(source, loop)
-		}
-	});
-	$("#resume").click(function(){
-		$("#pause").css("display", "none");
-		game.status = 1;
-		game.audio.play();
-		game.interval = setInterval(game.update, 10);
-	});
-	$("#back_to_title").click(function(){
-		$("#pause").css("display", "none");
-		$("#canvas-wrapper").hide();
-		$("#main-div").show();
-		game.audio.pause();
-		game.status = 0;
-		game.stop();
-	});
 	$("#main-start-button").click(function() {
 		$("#main-div").hide();		
 		$("#prologue-video").css("display", "block");
@@ -126,8 +82,10 @@ $(document).ready(function() {
 		}, 200);
 	});
 	$("#level-easy").click(function(){
-		ad.src = "src/audio/easy_mode.mp3";
-		ad.get(0).play();
+		ad = new Audio("src/audio/easy_mode.mp3");
+		// ad.autoplay = true;
+		ad.loop = true;
+		ad.play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		helpPopup();
@@ -137,8 +95,10 @@ $(document).ready(function() {
 		game.start();
 	});
 	$("#level-normal").click(function(){
-		ad.src = "src/audio/normal_mode.mp3";
-		ad.get(0).play();
+		ad = new Audio("src/audio/normal_mode.mp3");
+		// ad.autoplay = true;
+		ad.loop = true;
+		ad.play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		helpPopup();
@@ -148,8 +108,10 @@ $(document).ready(function() {
 		game.start();
 	});
 	$("#level-hard").click(function(){
-		ad.src = "src/audio/hard_mode.mp3";
-		ad.get(0).play();
+		ad = new Audio("src/audio/hard_mode.mp3");
+		// ad.autoplay = true;
+		ad.loop = true;
+		ad.play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
 		helpPopup();
@@ -173,7 +135,6 @@ class Game {
 		this.brick = new Brick("src/block.png", "src/block2.png", "src/question_block.png", 3, 18, 45, 45, 0, 45, 45);
 		this.ball = new Ball("src/ball.png", "src/ball_invinc.png", 5);
 		this.items = new Items();
-		this.audio = new Audio();
 		this.score = 0;
 		this.life = 0;
 		this.status = 0; //0: not ready, 1: ready, 2: running
@@ -187,7 +148,6 @@ class Game {
 	//게임 시작 시 한번 호출되는 함수
 	start() {
 		game.init();
-		this.audio.play();
 		setTimeout(() => this.status = 1, 100);
 		this.interval = setInterval(game.update, 10);
 		//...
@@ -204,8 +164,6 @@ class Game {
 	//게임 종료 시 한번 호출되는 함수
 	stop() {
 		clearInterval(this.interval);
-		game.ball.ballX = boardWidth/2;
-		game.ball.ballY = boardHeight/2;
 		//...
 	}
 
@@ -217,21 +175,18 @@ class Game {
 		this.bar.init(100);
 		switch (this.difficulty) {
 		case 0:
-			game.setMusic('src/audio/easy_mode.mp3', true);
 			this.timer = 999;
 			this.timerPerFrame = 0;
 			this.ball.init(4);
 			this.brick.init(1);
 			break;
 		case 1:
-			game.setMusic('src/audio/normal_mode.mp3', true);
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(5);
 			this.brick.init(1);
 			break;
 		case 2:
-			game.setMusic('src/audio/hard_mode.mp3', true);
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(6);
@@ -253,9 +208,6 @@ class Game {
 			game.stop();
 			this.status = 0;
 		}
-		if(this.status == 3){
-			game.stop();
-		}
 		this.bar.calculate();
 		if(this.status == 2) {
 			this.timer -= this.timerPerFrame;
@@ -275,13 +227,10 @@ class Game {
 	}
 
 	updateScoreBar() {
-		let str = "life: " + this.life + ", score: " + this.score + ", timer: " + parseInt(this.timer);
+		let str = "life: " + this.life + ", score: " + this.score;
+		if(this.difficulty != 0)
+			str += ", timer: " + parseInt(this.timer);
 		scoreBar.html(str);
-	}
-	
-	setMusic(source, loop){
-		this.audio.src = source;
-		this.audio.loop = loop;
 	}
 }
 
@@ -370,6 +319,9 @@ class Ball {
 			if((this.ballX + this.ballRadius > bar.x - bar.width/2) && (this.ballX - this.ballRadius < bar.x + bar.width/2)) {
 				if(this.angle >= PI) {
 					this.angle = PI/2 - ((this.ballX - bar.x)/(bar.width/2))*PI/3;
+					snd = new Audio("src/audio/fireball.mp3");
+					snd.volume = 0.5;
+					snd.play();
 				}
 			}
 		}
@@ -400,6 +352,9 @@ class Ball {
 						setTimeout(() => items.itemList[b.item - 1].durability = 0, 8000);
 					}
 					game.score += 1;
+					snd = new Audio("src/audio/breakblock.mp3");
+					snd.volume = 0.5;
+					snd.play();
 				}
 			}
 		}
@@ -493,8 +448,10 @@ class Items {
 			this.itemList[i].x = brick.bricks[this.randList[i].x][this.randList[i].y].x;
 			this.itemList[i].y = brick.bricks[this.randList[i].x][this.randList[i].y].y;
 		}
-		console.log(brick.bricks[this.randList[0].x][this.randList[0].y].x + ", " + brick.bricks[this.randList[0].x][this.randList[0].y].y);
-		console.log(this.itemList[0].x + ", " + this.itemList[0].y);
+		if(game.difficulty == 0)
+		{
+			brick.bricks[this.randList[2].x][this.randList[2].y].item = 0;
+		}
 	}
 
 	calculate(bar) {
@@ -558,6 +515,10 @@ class MushuroomR extends Item {
 	}
 
 	effect() {
+		snd = new Audio("src/audio/powerup.mp3");
+		snd.volume = 0.5;
+		snd.play();
+		
 		game.bar.width = game.bar.width * 2;
 	}
 }
@@ -568,6 +529,10 @@ class MushuroomG extends Item {
 	}
 
 	effect() {
+		snd = new Audio("src/audio/powerup.mp3");
+		snd.volume = 0.5;
+		snd.play();
+
 		game.life++;
 	}
 }
@@ -579,7 +544,11 @@ class FireFlower extends Item {
 	}
 
 	effect() {
+		snd = new Audio("src/audio/powerup.mp3");
+		snd.volume = 0.5;
+		snd.play();
 
+		game.timer += 30;
 	}
 }
 
@@ -588,6 +557,10 @@ class Star extends Item {
 		super(image, width, height, 2, -5);
 	}
 	effect() {
+		snd = new Audio("src/audio/powerup.mp3");
+		snd.volume = 0.5;
+		snd.play();
+
 		game.ball.speed = game.ball.speed * 2;
 		game.ball.invinc = 1;
 		setTimeout(()=> {
