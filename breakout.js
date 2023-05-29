@@ -24,6 +24,14 @@ $(document).ready(function() {
 	vd = $("video");
 	ad = $("#audio");
 
+	//functions
+	function helpPopup(){
+		$("#help").css("display", "block");
+		$("#help-ok").click(function(){
+			$("#help").css("display", "none");
+		});
+	}
+
 	//events
 	document.addEventListener('keydown',(e)=>{
 		if(e.key=='Escape'){
@@ -122,6 +130,7 @@ $(document).ready(function() {
 		ad.get(0).play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
+		helpPopup();
 		$("#canvas-wrapper").css("display", "block");
 		$("#board").css("background-image", "url(src/background1.jpg)")
 		game.difficulty = 0;
@@ -132,6 +141,7 @@ $(document).ready(function() {
 		ad.get(0).play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
+		helpPopup();
 		$("#canvas-wrapper").css("display", "block");
 		$("#board").css("background-image", "url(src/background2.jpg)")
 		game.difficulty = 1;
@@ -142,6 +152,7 @@ $(document).ready(function() {
 		ad.get(0).play();
 		$("#level").css("display", "none");
 		$("#main-div").hide();
+		helpPopup();
 		$("#canvas-wrapper").css("display", "block");
 		$("#board").css("background-image", "url(src/background3.jpg)")
 		game.difficulty = 2;
