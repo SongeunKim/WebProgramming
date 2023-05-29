@@ -22,6 +22,7 @@ body {
 	height: 700px;
 	background-color: lightgray;
 	background-image: url("src/background1.jpg");
+	position: relative;
 }
 
 #main-blank {
@@ -53,16 +54,34 @@ body {
 }
 
 #main-settings-button {
-	margin: 148px 50px 50px 750px;
+	position: absolute;
+	right: 50px;
+	bottom: 50px;
 	width: 100px;
 	height: 50px;
 	text-align: center;
 	line-height: 50px;
 /*	border: 1px solid black;*/
-
 }
 
 #main-settings-button img {
+	width: 100px;
+	height: 50px;
+	object-fit: contain;
+}
+
+#sound-button {
+	position: absolute;
+	right:150px;
+	bottom:50px;
+	width: 100px;
+	height: 50px;
+	text-align: center;
+	line-height: 50px;
+/*	border: 1px solid black;*/
+}
+
+#sound-button img {
 	width: 100px;
 	height: 50px;
 	object-fit: contain;
@@ -182,6 +201,7 @@ select{
 option{
 	background: #fc0;
 	color: black;
+	text-align: center;
 }
 
 #help {
