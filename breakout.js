@@ -195,16 +195,14 @@ $(document).ready(function() {
 		}
 	});
 	$(".result-button").click(function(){
-		if(game.score < game.brick.brickColumnCount*game.brick.brickRowCount){
+		if($("#result-title").html()=="GAME CLEAR"){
 			$("#result").css("display", "none");
+			game.difficulty = game.difficulty + 1;
 			game.start();
 		}
 		else{
-			game.difficulty+=1;
-			game.start();
-			$("#result-title").html("game over");
-			$(".result-button").html("RETRY");
 			$("#result").css("display", "none");
+			game.start();
 		}
 	});
 
@@ -260,11 +258,15 @@ class Game {
 	stop() {
 		clearInterval(this.interval);
 		game.audio.pause();
-		if(this.life <= 0 || this.timer <= 0)
-		{
-			$("#result").css("display", "block");
+		if(game.status == 1 || game.status == 2){
+			if(this.life <= 0 || this.timer <= 0)
+			{
+				$("#result-title").html("GAME OVER");
+				$(".result-button").html("RETRY");
+			}
+				$("#result").css("display", "block");
+			//...
 		}
-		//...
 	}
 
 	//게임 환경 초기화 함수
