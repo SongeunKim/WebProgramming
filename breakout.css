@@ -18,6 +18,7 @@ body {
 }
 
 #main-div {
+/*	display: none;*/
 	width: 900px;
 	height: 700px;
 	background-color: lightgray;
@@ -270,4 +271,15 @@ option{
 #image_show{
 	width: 100px;
 	height: 100px;
+}
+
+#ending-img {
+	width: 900px;
+	height: 700px;
+	background-color: black;
+	display: none;
+}
+
+#ending-img img {
+	display: none;
 }
