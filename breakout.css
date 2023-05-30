@@ -266,3 +266,8 @@ option{
 	left: 50%;
 	margin-left: -250px;
 }
+
+#image_show{
+	width: 100px;
+	height: 100px;
+}

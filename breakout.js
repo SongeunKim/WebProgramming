@@ -11,6 +11,7 @@ var vd;
 var bgm;
 var snd;
 let muted = 1;
+let first_time = 1;
 
 //ready
 $(document).ready(function() {
@@ -32,10 +33,13 @@ $(document).ready(function() {
 
 	//functions
 	function helpPopup(){
-		$("#help").css("display", "block");
-		$("#help-ok").click(function(){
-			$("#help").css("display", "none");
-		});
+		if(first_time == 1){
+			first_time = 0;
+			$("#help").css("display", "block");
+			$("#help-ok").click(function(){
+				$("#help").css("display", "none");
+			});
+		}
 	}
 
 	//events
@@ -50,6 +54,10 @@ $(document).ready(function() {
 					if(muted==0){
 						bgm.play();
 					}
+				}else if(game.status==3){
+					game.status = 1;
+					game.audio.play();
+					game.interval = setInterval(game.update, 10);
 				}
 				$("#settings").css("display", "none");
 			}
@@ -91,12 +99,20 @@ $(document).ready(function() {
 
 	//event handlers
 	$("#bar_image").on("change",function(){
-		if($(this).val()!="제목")
-			game.bar.image.src = $(this).val();
+		var src = $(this).val();
+		if(src!="head"){
+			game.bar.image.src = src;
+			$("#image_show").attr("src",src);
+			$("#image_show").css("width","200px");
+		}
 	});
 	$("#ball_image").on("change",function(){
-		if($(this).val()!="제목")
-			game.ball.image.src = $(this).val();
+		var src = $(this).val();
+		if(src!="head"){
+			game.ball.image.src = src;
+			$("#image_show").attr("src",src);
+			$("#image_show").css("width","100px");
+		}
 	});
 	$("#background_music").on("change",function(){
 		if($(this).val()!="제목"){
@@ -121,32 +137,42 @@ $(document).ready(function() {
 			bgm.play();
 		}
 	});
+	$("#setting_menu").click(function(){
+		$("#pause").css("display", "none");
+		$("#settings").css("display", "block");
+		popUp($("#settings"));
+	});
 	$("#main-start-button").click(function() {
-		$("#main-div").hide();		
-		$("#prologue-video").css("display", "block");
-		bgm.pause();
-		vd.get(0).currentTime = "0";
-		vd.get(0).play();
-		let interval = setInterval(function() {
-			if(vd.prop("ended")) {
-				$("#prologue-video").hide();
-				$("#prologue-text").css("display", "block");
-				setTimeout(function() {
-					$("#text1").fadeOut(500);
+		if(first_time == 1){
+			$("#main-div").hide();		
+			$("#prologue-video").css("display", "block");
+			bgm.pause();
+			vd.get(0).currentTime = "0";
+			vd.get(0).play();
+			let interval = setInterval(function() {
+				if(vd.prop("ended")) {
+					$("#prologue-video").hide();
+					$("#prologue-text").css("display", "block");
 					setTimeout(function() {
-						$("#text2").fadeIn(500);
+						$("#text1").fadeOut(500);
 						setTimeout(function() {
-							$("#prologue-text").fadeOut(1000);
+							$("#text2").fadeIn(500);
 							setTimeout(function() {
-								$("#level").css("display", "block");
-								popUp($("#level"));
-							}, 1000);
-						}, 4000);
-					}, 1000);
-				}, 4000);
-				clearInterval(interval);
-			}
-		}, 200);
+								$("#prologue-text").fadeOut(1000);
+								setTimeout(function() {
+									$("#level").css("display", "block");
+									popUp($("#level"));
+								}, 1000);
+							}, 4000);
+						}, 1000);
+					}, 4000);
+					clearInterval(interval);
+				}
+			}, 200);
+		}else{
+			$("#level").css("display", "block");
+			popUp($("#level"));
+		}
 	});
 	$("#level-easy").click(function(){
 		$("#level").css("display", "none");
