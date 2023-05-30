@@ -163,9 +163,9 @@ $(document).ready(function() {
 									$("#level").css("display", "block");
 									popUp($("#level"));
 								}, 1000);
-							}, 4000);
+							}, 3000);
 						}, 1000);
-					}, 4000);
+					}, 3000);
 					clearInterval(interval);
 				}
 			}, 200);
@@ -350,10 +350,38 @@ class Game {
 			game.stop();
 		}
 		if (this.score >= this.brick.brickColumnCount*this.brick.brickRowCount){
-			$("#result").css("display", "block");
-			$("#result-title").html("GAME CLEAR");
-			$(".result-button").html("NEXT LEVEL");
-			game.stop();
+			if (game.difficulty == 2) {
+				game.stop();
+				$("#result").css("display", "none");
+				$("#canvas-wrapper").fadeOut(1500);
+				setTimeout(function() {
+					$("#ending-img").fadeIn(1500);
+					$("#ending-img1").fadeIn(1500);
+					setTimeout(function() {
+						$("#ending-img1").fadeOut(500);
+						setTimeout(function() {
+							$("#ending-img2").fadeIn(500);
+							setTimeout(function() {
+								$("#ending-img2").fadeOut(500);
+								setTimeout(function() {
+									$("#ending-img").css("display", "none")
+									$("#main-div").show();
+									if(muted==1){
+										bgm.currentTime = "0";
+										bgm.play();
+									}
+								}, 500);
+							}, 4000);
+						}, 1000);
+					}, 4000);
+				}, 1500);
+			}
+			else {
+				$("#result").css("display", "block");
+				$("#result-title").html("GAME CLEAR");
+				$(".result-button").html("NEXT LEVEL");
+				game.stop();
+			}
 		}
 		this.bar.calculate();
 		if(this.status == 2) {
