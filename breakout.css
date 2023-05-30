@@ -53,6 +53,12 @@ body {
 	text-shadow: -3px 0px black, 0px 3px black, 3px 0px black, 0px -3px black;
 }
 
+#main-start-button:hover {
+	color: black;
+	text-shadow: -3px 0px white, 0px 3px white, 3px 0px white, 0px -3px white;
+
+}
+
 #main-settings-button {
 	position: absolute;
 	right: 50px;
@@ -176,6 +182,11 @@ body {
 	font-size: 30px;
 }
 
+#prologue-skip:hover {
+	color: black;
+	text-shadow: -2px 0px white, 0px 2px white, 2px 0px white, 0px -2px white;
+}
+
 #prologue-text {
 	width: 900px;
 	height: 700px;
@@ -217,6 +228,36 @@ option{
 	text-shadow: none;
 	color: black;
 	line-height: normal;
+}
+
+#resume:hover {
+	color: black;
+	text-shadow: -3px 0px white, 0px 3px white, 3px 0px white, 0px -3px white;
+}
+
+#back_to_title:hover {
+	color: black;
+	text-shadow: -3px 0px white, 0px 3px white, 3px 0px white, 0px -3px white;
+}
+
+#setting_menu:hover {
+	color: black;
+	text-shadow: -3px 0px white, 0px 3px white, 3px 0px white, 0px -3px white;
+}
+
+.result-home:hover {
+	color: black;
+	text-shadow: -3px 0px white, 0px 3px white, 3px 0px white, 0px -3px white;
+}
+
+.result-button:hover {
+	color: black;
+	text-shadow: -3px 0px white, 0px 3px white, 3px 0px white, 0px -3px white;
+}
+
+.level-button:hover {
+	color: black;
+	text-shadow: -3px 0px white, 0px 3px white, 3px 0px white, 0px -3px white;
 }
 
 #result {
