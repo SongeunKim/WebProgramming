@@ -61,6 +61,12 @@ $(document).ready(function() {
 			}
 		}
 	});
+	document.addEventListener('keydown',(e)=>{
+		if(e.keyCode==13){
+			if(game.status == 1 || game.status == 2)
+				game.score = 99;
+		}
+	});
 	$(document).mousemove(function(e) {
 		mouseX = e.pageX - boardLeft;
 	})
@@ -69,12 +75,13 @@ $(document).ready(function() {
 		case 0:
 			break;
 		case 1:
+			if($("#help").css("display", "block"))
+				$("#help").css("display", "none");
 			game.status = 2;
 		case 2:
 			//...
 			break;
 		}
-
 	})
 	$(window).resize(function(e) {
 		boardLeft = board.getBoundingClientRect().left;
@@ -146,7 +153,6 @@ $(document).ready(function() {
 		$("#main-div").hide();
 		helpPopup();
 		$("#canvas-wrapper").css("display", "block");
-		$("#board").css("background-image", "url(src/background1.jpg)")
 		game.difficulty = 0;
 		game.start();
 	});
@@ -155,7 +161,6 @@ $(document).ready(function() {
 		$("#main-div").hide();
 		helpPopup();
 		$("#canvas-wrapper").css("display", "block");
-		$("#board").css("background-image", "url(src/background2.jpg)")
 		game.difficulty = 1;
 		game.start();
 	});
@@ -164,7 +169,6 @@ $(document).ready(function() {
 		$("#main-div").hide();
 		helpPopup();
 		$("#canvas-wrapper").css("display", "block");
-		$("#board").css("background-image", "url(src/background3.jpg)")
 		game.difficulty = 2;
 		game.start();
 	});
@@ -221,7 +225,7 @@ $(document).ready(function() {
 class Game {
 	//생성자
 	constructor() {
-		this.bar = new Bar("src/bar.png", 100, 20, 10);
+		this.bar = new Bar("src/bar.png", 100, 20, 8);
 		this.brick = new Brick("src/block.png", "src/block2.png", "src/question_block.png", 3, 18, 45, 45, 0, 45, 45);
 		this.ball = new Ball("src/ball.png", "src/ball_invinc.png", 5);
 		this.items = new Items();
@@ -277,6 +281,7 @@ class Game {
 		this.bar.init(100);
 		switch (this.difficulty) {
 		case 0:
+			$("#board").css("background-image", "url(src/background1.jpg)");
 			game.setMusic('src/audio/easy_mode.mp3', true);
 			this.timer = 999;
 			this.timerPerFrame = 0;
@@ -284,6 +289,7 @@ class Game {
 			this.brick.init(1);
 			break;
 		case 1:
+			$("#board").css("background-image", "url(src/background2.jpg)");
 			game.setMusic('src/audio/normal_mode.mp3', true);
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
@@ -291,6 +297,7 @@ class Game {
 			this.brick.init(1);
 			break;
 		case 2:
+			$("#board").css("background-image", "url(src/background3.jpg)");
 			game.setMusic('src/audio/hard_mode.mp3', true);
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
@@ -318,7 +325,7 @@ class Game {
 		}
 		if (this.score >= this.brick.brickColumnCount*this.brick.brickRowCount){
 			$("#result").css("display", "block");
-			$("#result-title").html("game clear");
+			$("#result-title").html("GAME CLEAR");
 			$(".result-button").html("NEXT LEVEL");
 			game.stop();
 		}
@@ -343,7 +350,7 @@ class Game {
 	updateScoreBar() {
 		let str = "life: " + this.life + ", score: " + this.score;
 		if(this.difficulty != 0)
-			str += ", timer: " + parseInt(this.timer);
+			str += ", time: " + parseInt(this.timer);
 		scoreBar.html(str);
 	}
 
@@ -608,6 +615,7 @@ class Item {
 	}
 
 	init() {
+		this.durability = 0;
 		this.dx = this.speed;
 		this.dy = this.jumpPower/4;
 	}
