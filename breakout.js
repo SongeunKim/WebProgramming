@@ -68,8 +68,6 @@ $(document).ready(function() {
 				popUp($("#pause"));
 			}
 		}
-	});
-	document.addEventListener('keydown',(e)=>{
 		if(e.keyCode==13){
 			if(game.status == 1 || game.status == 2)
 				game.score = 99;
@@ -382,6 +380,7 @@ class Game {
 				$(".result-button").html("NEXT LEVEL");
 				game.stop();
 			}
+			game.status = 0;
 		}
 		this.bar.calculate();
 		if(this.status == 2) {
