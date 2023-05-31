@@ -414,7 +414,6 @@ class Game {
 			this.ball.calculate(this.bar, this.brick, this.items);
 			this.items.calculate(this.bar);
 		}
-		console.log("")
 		//...
 	}
 
