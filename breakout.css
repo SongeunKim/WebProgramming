@@ -283,3 +283,8 @@ option{
 #ending-img img {
 	display: none;
 }
+
+#settings {
+	font-size: 30px;
+}
+
