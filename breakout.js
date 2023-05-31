@@ -29,7 +29,6 @@ $(document).ready(function() {
 	bgm.autoplay = true;
 	bgm.loop = true;
 	vd = $("video");
-	
 
 	//functions
 	function helpPopup(){
@@ -42,26 +41,24 @@ $(document).ready(function() {
 		}
 	}
 
+	function popUp(obj) {
+		var w = ($(window).width()-obj.width())/2;
+		var h = ($(window).height()-obj.width())/2;
+		obj.css({top:h, left:w});
+	}
+
 	//events
 	document.addEventListener('keydown',(e)=>{
 		if(e.key=='Escape'){
-			if($("#level").css("display","block")){
-				$("#level").css("display","none");
-			}
 			if($("#settings").css("display", "block")){
-				if(game.status == 0) {
-					$("#main-div").show();
-					if(muted==0){
-						bgm.play();
-					}
-				}else if(game.status==3){
+				if(game.status==3) {
 					game.status = 1;
 					game.audio.play();
 					game.interval = setInterval(game.update, 10);
 				}
 				$("#settings").css("display", "none");
 			}
-			if(game.status == 2 || game.status == 1){
+			if(game.status == 2 || game.status == 1) {
 				game.status = 3;
 				game.audio.pause();
 				$("#pause").css("display", "block");
@@ -301,7 +298,7 @@ class Game {
 				snd.volume = 0.5;
 				snd.play();
 			}
-				$("#result").css("display", "block");
+			$("#result").css("display", "block");
 			//...
 		}
 		if(game.status != 3){
@@ -409,7 +406,7 @@ class Game {
 				snd.play();
 				game.stop();
 			}
-			game.status = 0;
+			this.status = 0;
 		}
 		this.bar.calculate();
 		if(this.status == 2) {
@@ -417,6 +414,7 @@ class Game {
 			this.ball.calculate(this.bar, this.brick, this.items);
 			this.items.calculate(this.bar);
 		}
+		console.log("")
 		//...
 	}
 
@@ -800,8 +798,3 @@ class Star extends Item {
 	}
 }
 
-function popUp(obj){
-	var w = ($(window).width()-obj.width())/2;
-	var h = ($(window).height()-obj.width())/2;
-	obj.css({top:h, left:w});
-}
