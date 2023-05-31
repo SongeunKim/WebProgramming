@@ -72,6 +72,10 @@ $(document).ready(function() {
 			if(game.status == 1 || game.status == 2)
 				game.score = 99;
 		}
+		if(e.keyCode==32){
+			if(game.status == 2)
+				game.timer = 60;
+		}
 	});
 	$(document).mousemove(function(e) {
 		mouseX = e.pageX - boardLeft;
@@ -261,6 +265,8 @@ class Game {
 		this.timer = 0;
 		this.timerPerFrame = 0;
 		this.interval; //update interval
+		this.runningOut = 0;
+		this.runningOutTimeout;
 		//...
 	}
 
@@ -298,6 +304,10 @@ class Game {
 				$("#result").css("display", "block");
 			//...
 		}
+		if(game.status != 3){
+			clearTimeout(this.runningOutTimeout);
+			clearTimeout(this.items.itemList[3].defaultTimeout);
+		}
 	}
 
 	//게임 환경 초기화 함수
@@ -306,6 +316,8 @@ class Game {
 		this.score = 0;
 		this.life = 3;
 		this.bar.init(100);
+		this.runningOut = 0;
+		this.audio.playbackRate = 1;
 		switch (this.difficulty) {
 		case 0:
 			$("#board").css("background-image", "url(src/background1.jpg)");
@@ -343,6 +355,15 @@ class Game {
 			this.timer = 0;
 			this.life = 0;
 		}
+		else if (this.timer <= 60 && this.runningOut == 0) {
+			this.audio.pause();
+			this.runningOut = 1;
+			snd = new Audio("src/audio/running_out.mp3");
+			snd.volume = 0.5;
+			snd.play();
+			this.runningOutTimeout = setTimeout(()=>this.audio.play(), 3500)
+			this.audio.playbackRate = 1.3;
+		}
 		if(this.life == 0) {
 			game.stop();
 			this.status = 0;
@@ -352,6 +373,8 @@ class Game {
 		}
 		if (this.score >= this.brick.brickColumnCount*this.brick.brickRowCount){
 			if (game.difficulty == 2) {
+				this.status = 0;
+				clearTimeout(this.runningOutTimeout);
 				game.stop();
 				$("#result").css("display", "none");
 				$("#canvas-wrapper").fadeOut(1500);
@@ -761,6 +784,7 @@ class FireFlower extends Item {
 class Star extends Item {
 	constructor(image, width, height) {
 		super(image, width, height, 2, -5);
+		this.defaultTimeout;
 	}
 	effect() {
 		snd = new Audio("src/audio/powerup.mp3");
@@ -769,7 +793,7 @@ class Star extends Item {
 
 		game.ball.speed = game.ball.speed * 2;
 		game.ball.invinc = 1;
-		setTimeout(()=> {
+		this.defaultTimeout = setTimeout(()=> {
 			game.ball.speed = game.ball.speed * 0.5;
 			game.ball.invinc = 0;
 		}, 5000);
