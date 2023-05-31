@@ -291,6 +291,9 @@ class Game {
 			{
 				$("#result-title").html("GAME OVER");
 				$(".result-button").html("RETRY");
+				snd = new Audio("src/audio/game_over.mp3");
+				snd.volume = 0.5;
+				snd.play();
 			}
 				$("#result").css("display", "block");
 			//...
@@ -378,6 +381,9 @@ class Game {
 				$("#result").css("display", "block");
 				$("#result-title").html("GAME CLEAR");
 				$(".result-button").html("NEXT LEVEL");
+				snd = new Audio("src/audio/game_clear.mp3");
+				snd.volume = 0.5;
+				snd.play();
 				game.stop();
 			}
 			game.status = 0;
