@@ -130,7 +130,6 @@ body {
 	top:0;
 	left:0;
 	z-index: 1;
-	/*margin: 150px 200px;*/
 	width: 500px;
 	height: 400px;
 	background-color: rgb(244, 234, 92);
@@ -148,7 +147,6 @@ body {
 	text-align: center;
 	line-height: 180px;
 	font-size: 60px;
-/*	padding: 50px auto;*/
 }
 
 .popup-button {
@@ -273,6 +271,11 @@ option{
 	height: 100px;
 }
 
+#help_image{
+	width: 100px;
+	height: 100px;
+}
+
 #ending-img {
 	width: 900px;
 	height: 700px;
@@ -288,3 +291,6 @@ option{
 	font-size: 30px;
 }
 
+#pause-title{
+	font-size: 60px;
+}

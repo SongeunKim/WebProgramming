@@ -11,7 +11,8 @@ var vd;
 var bgm;
 var snd;
 let muted = 1;
-let first_time = 1;
+let tutorial = 1;
+let user_change = 0;
 
 //ready
 $(document).ready(function() {
@@ -29,65 +30,75 @@ $(document).ready(function() {
 	bgm.autoplay = true;
 	bgm.loop = true;
 	vd = $("video");
+	
 
 	//functions
 	function helpPopup(){
-		if(first_time == 1){
-			first_time = 0;
+		if(tutorial == 1){
+			tutorial = 0;
 			$("#help").css("display", "block");
-			$("#help-ok").click(function(){
-				$("#help").css("display", "none");
-			});
 		}
 	}
 
-	function popUp(obj) {
-		var w = ($(window).width()-obj.width())/2;
-		var h = ($(window).height()-obj.width())/2;
-		obj.css({top:h, left:w});
+	function change_help_popup(){
+		var arr = ["꽃 – 타이머 시간 추가","초록버섯 – 목숨 추가","빨간버섯 – 바 길이","스타 – 피버타임"];
+		var src = ["src/fire_flower.png","src/mushroom_green.png","src/mushroom_red.png","src/star.png"];
+		$("#item-help").html(arr[tutorial]);
+		$("#help_image").attr("src",src[tutorial]);
+		tutorial++;
 	}
 
 	//events
 	document.addEventListener('keydown',(e)=>{
 		if(e.key=='Escape'){
-			if($("#settings").css("display", "block")){
-				if(game.status==3) {
+			if($("#level").css("display") == "block"){
+				$("#level").css("display","none");
+			}
+			if($("#settings").css("display") == "block"){
+				if(game.status == 0) {
+					$("#main-div").show();
+					if(muted==0){
+						bgm.play();
+					}
+				}else if(game.status==3){
 					game.status = 1;
 					game.audio.play();
 					game.interval = setInterval(game.update, 10);
 				}
 				$("#settings").css("display", "none");
 			}
-			if(game.status == 2 || game.status == 1) {
-				game.status = 3;
-				game.audio.pause();
-				$("#pause").css("display", "block");
-				popUp($("#pause"));
+			if(game.status == 2 || game.status == 1){
+				if($("#help").css("display") == "none"){
+					game.status = 3;
+					game.audio.pause();
+					$("#pause").css("display", "block");
+					popUp($("#pause"));
+				}
 			}
 		}
 		if(e.keyCode==13){
 			if(game.status == 1 || game.status == 2)
 				game.score = 99;
 		}
-		if(e.keyCode==32){
-			if(game.status == 2)
-				game.timer = 60;
-		}
 	});
 	$(document).mousemove(function(e) {
 		mouseX = e.pageX - boardLeft;
 	})
 	$(document).click(function(){
-		switch(game.status){
-		case 0:
-			break;
-		case 1:
-			if($("#help").css("display", "block"))
-				$("#help").css("display", "none");
-			game.status = 2;
-		case 2:
-			//...
-			break;
+		if(tutorial !=4 && ($("#help").css("display")=="block")){
+			change_help_popup()
+		}else{
+			switch(game.status){
+				case 0:
+					break;
+				case 1:
+					if($("#help").css("display") == "block")
+						$("#help").css("display", "none");
+					game.status = 2;
+				case 2:
+					//...
+					break;
+			}
 		}
 	})
 	$(window).resize(function(e) {
@@ -115,6 +126,7 @@ $(document).ready(function() {
 	});
 	$("#background_music").on("change",function(){
 		if($(this).val()!="제목"){
+			user_change = 1;
 			var source = $(this).val();
 			var loop = true;
 			game.setMusic(source, loop)
@@ -142,7 +154,7 @@ $(document).ready(function() {
 		popUp($("#settings"));
 	});
 	$("#main-start-button").click(function() {
-		if(first_time == 1){
+		if(tutorial == 1){
 			$("#main-div").hide();		
 			$("#prologue-video").css("display", "block");
 			bgm.pause();
@@ -262,8 +274,6 @@ class Game {
 		this.timer = 0;
 		this.timerPerFrame = 0;
 		this.interval; //update interval
-		this.runningOut = 0;
-		this.runningOutTimeout;
 		//...
 	}
 
@@ -298,12 +308,8 @@ class Game {
 				snd.volume = 0.5;
 				snd.play();
 			}
-			$("#result").css("display", "block");
+				$("#result").css("display", "block");
 			//...
-		}
-		if(game.status != 3){
-			clearTimeout(this.runningOutTimeout);
-			clearTimeout(this.items.itemList[3].defaultTimeout);
 		}
 	}
 
@@ -313,12 +319,14 @@ class Game {
 		this.score = 0;
 		this.life = 3;
 		this.bar.init(100);
-		this.runningOut = 0;
-		this.audio.playbackRate = 1;
 		switch (this.difficulty) {
 		case 0:
 			$("#board").css("background-image", "url(src/background1.jpg)");
-			game.setMusic('src/audio/easy_mode.mp3', true);
+			if(user_change==1){
+				user_change=0;
+			}else{
+				game.setMusic('src/audio/easy_mode.mp3', true);
+			}
 			this.timer = 999;
 			this.timerPerFrame = 0;
 			this.ball.init(4);
@@ -326,7 +334,11 @@ class Game {
 			break;
 		case 1:
 			$("#board").css("background-image", "url(src/background2.jpg)");
-			game.setMusic('src/audio/normal_mode.mp3', true);
+			if(user_change==1){
+				user_change=0;
+			}else{
+				game.setMusic('src/audio/normal_mode.mp3', true);
+			}
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(5);
@@ -334,7 +346,11 @@ class Game {
 			break;
 		case 2:
 			$("#board").css("background-image", "url(src/background3.jpg)");
-			game.setMusic('src/audio/hard_mode.mp3', true);
+			if(user_change==1){
+				user_change=0;
+			}else{
+				game.setMusic('src/audio/hard_mode.mp3', true);
+			}
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(6);
@@ -352,15 +368,6 @@ class Game {
 			this.timer = 0;
 			this.life = 0;
 		}
-		else if (this.timer <= 60 && this.runningOut == 0) {
-			this.audio.pause();
-			this.runningOut = 1;
-			snd = new Audio("src/audio/running_out.mp3");
-			snd.volume = 0.5;
-			snd.play();
-			this.runningOutTimeout = setTimeout(()=>this.audio.play(), 3500)
-			this.audio.playbackRate = 1.3;
-		}
 		if(this.life == 0) {
 			game.stop();
 			this.status = 0;
@@ -370,8 +377,6 @@ class Game {
 		}
 		if (this.score >= this.brick.brickColumnCount*this.brick.brickRowCount){
 			if (game.difficulty == 2) {
-				this.status = 0;
-				clearTimeout(this.runningOutTimeout);
 				game.stop();
 				$("#result").css("display", "none");
 				$("#canvas-wrapper").fadeOut(1500);
@@ -406,7 +411,7 @@ class Game {
 				snd.play();
 				game.stop();
 			}
-			this.status = 0;
+			game.status = 0;
 		}
 		this.bar.calculate();
 		if(this.status == 2) {
@@ -781,7 +786,6 @@ class FireFlower extends Item {
 class Star extends Item {
 	constructor(image, width, height) {
 		super(image, width, height, 2, -5);
-		this.defaultTimeout;
 	}
 	effect() {
 		snd = new Audio("src/audio/powerup.mp3");
@@ -790,10 +794,15 @@ class Star extends Item {
 
 		game.ball.speed = game.ball.speed * 2;
 		game.ball.invinc = 1;
-		this.defaultTimeout = setTimeout(()=> {
+		setTimeout(()=> {
 			game.ball.speed = game.ball.speed * 0.5;
 			game.ball.invinc = 0;
 		}, 5000);
 	}
 }
 
+function popUp(obj){
+	var w = ($(window).width()-obj.width())/2;
+	var h = ($(window).height()-obj.width())/2;
+	obj.css({top:h, left:w});
+}
