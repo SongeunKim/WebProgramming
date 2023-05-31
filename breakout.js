@@ -313,7 +313,7 @@ class Game {
 			this.timer = 999;
 			this.timerPerFrame = 0;
 			this.ball.init(4);
-			this.brick.init(1);
+			this.brick.init(1, 2, 18);
 			break;
 		case 1:
 			$("#board").css("background-image", "url(src/background2.jpg)");
@@ -321,7 +321,7 @@ class Game {
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(5);
-			this.brick.init(1);
+			this.brick.init(1, 3, 18);
 			break;
 		case 2:
 			$("#board").css("background-image", "url(src/background3.jpg)");
@@ -329,7 +329,7 @@ class Game {
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(6);
-			this.brick.init(2);
+			this.brick.init(2, 4, 18);
 			break;
 		default:
 			break;
@@ -514,24 +514,28 @@ class Ball {
 			}
 		}
 		//벽돌 충돌
+		loop:
 		for (let i = 0; i < brick.brickColumnCount; i++) {
 			for (let q = 0; q < brick.brickRowCount; q++) {
 				let b = brick.bricks[i][q];
+				let isCol = 0;
 				if(b.durability <= 0) continue;
 				if((this.ballY + this.ballRadius >= b.y) && (this.ballY - this.ballRadius <= b.y + brick.brickHeight)) {
 					if((this.ballX >= b.x) && (this.ballX <= b.x + brick.brickWidth)) {
-						
-						b.durability -= 1;
 						this.angle = 2*PI - this.angle;
+						b.durability -= 1;
+						isCol = 1;
 					}
 				}
 				if((this.ballX + this.ballRadius >= b.x) && (this.ballX - this.ballRadius <= b.x + brick.brickWidth)) {
 					if((this.ballY >= b.y) && (this.ballY <= b.y + brick.brickHeight))	{
-						b.durability -= 1;
 						if (this.angle <= PI)
 							this.angle = PI - this.angle;
 						else
 							this.angle = 3*PI - this.angle;
+						if(isCol == 0)
+							b.durability -= 1;
+						isCol = 1;
 					}
 				}
 				if(b.durability <= 0) {
@@ -544,6 +548,8 @@ class Ball {
 					snd.volume = 0.5;
 					snd.play();
 				}
+				if(isCol == 1)
+					break loop;
 			}
 		}
 		this.ballX += this.speed * Math.cos(this.angle);
@@ -577,7 +583,9 @@ class Brick {
 		this.bricks = [];
 	}
 
-	init(d) {
+	init(d, rowNum, colNum) {
+		this.brickColumnCount = colNum;
+		this.brickRowCount = rowNum;
 		for(var i=0; i<this.brickColumnCount; i++){
 			this.bricks[i] = [];
 			for(var j=0; j<this.brickRowCount; j++){
