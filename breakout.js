@@ -3,16 +3,16 @@ let scoreBar;
 let board;
 let boardCtx;
 let boardLeft;
+let game;
+let vd;
+let bgm;
+let snd;
+let muted;
+let tutorial;
+let user_change;
 const boardWidth = 900;
 const boardHeight = 600;
-let game;
 const PI = Math.PI;
-var vd;
-var bgm;
-var snd;
-let muted = 1;
-let tutorial = 1;
-let user_change = 0;
 
 //ready
 $(document).ready(function() {
@@ -25,12 +25,14 @@ $(document).ready(function() {
 	board.width = boardWidth;
 	board.height = boardHeight;
 	game = new Game();
+	vd = $("video");
 	bgm = new Audio();
 	bgm.src = "src/audio/title_screen.mp3";
 	bgm.autoplay = true;
 	bgm.loop = true;
-	vd = $("video");
-	
+	muted = 1;
+	tutorial = 1;
+	user_change = 0;
 
 	//functions
 	function helpPopup(){
@@ -39,7 +41,6 @@ $(document).ready(function() {
 			$("#help").css("display", "block");
 		}
 	}
-
 	function change_help_popup(){
 		var arr = ["꽃 – 타이머 시간 추가","초록버섯 – 목숨 추가","빨간버섯 – 바 길이","스타 – 피버타임"];
 		var src = ["src/fire_flower.png","src/mushroom_green.png","src/mushroom_red.png","src/star.png"];
@@ -99,7 +100,10 @@ $(document).ready(function() {
 						$("#help").css("display", "none");
 					game.status = 2;
 				case 2:
-					//...
+					break;
+				case 3:
+					break;
+				default:
 					break;
 			}
 		}
@@ -107,8 +111,6 @@ $(document).ready(function() {
 	$(window).resize(function(e) {
 		boardLeft = board.getBoundingClientRect().left;
 	})
-	
-	//...
 
 	//event handlers
 	$("#bar_image").on("change",function(){
@@ -228,7 +230,6 @@ $(document).ready(function() {
 		}
 		
 	});
-	
 	$(".result-home").click(function(){
 		$("#result").css("display", "none");
 		$("#canvas-wrapper").css("display", "none");
@@ -279,7 +280,6 @@ class Game {
 		this.interval; //update interval
 		this.runningOut = 0;
 		this.runningOutTimeout;
-		//...
 	}
 
 	//게임 시작 시 한번 호출되는 함수
@@ -289,7 +289,6 @@ class Game {
 		this.audio.play();
 		setTimeout(() => this.status = 1, 100);
 		this.interval = setInterval(game.update, 10);
-		//...
 	}
 
 	//게임 시작 후 매 프레임마다 호출되는 함수
@@ -297,7 +296,6 @@ class Game {
 		game.calculate();
 		game.draw();
 		game.updateScoreBar();
-		//...
 	}
 
 	//게임 종료 시 한번 호출되는 함수
@@ -313,8 +311,7 @@ class Game {
 				snd.volume = 0.5;
 				snd.play();
 			}
-				$("#result").css("display", "block");
-			//...
+			$("#result").css("display", "block");
 		}
 		if(game.status != 3){
 			clearTimeout(this.runningOutTimeout);
@@ -371,7 +368,6 @@ class Game {
 		default:
 			break;
 		}
-		//...
 	}
 
 	//게임 내 수치 계산 함수
@@ -442,7 +438,6 @@ class Game {
 			this.ball.calculate(this.bar, this.brick, this.items);
 			this.items.calculate(this.bar);
 		}
-		//...
 	}
 
 	//그리기 함수
