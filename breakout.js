@@ -148,7 +148,8 @@ $(document).ready(function() {
 		$("#main-div").show();
 		game.status = 0;
 		game.stop();
-		if(muted==0){
+		if(muted==1){
+			bgm.currentTime = "0";
 			bgm.play();
 		}
 	});
