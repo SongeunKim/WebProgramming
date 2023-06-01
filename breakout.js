@@ -13,7 +13,6 @@ var snd;
 let muted = 1;
 let tutorial = 1;
 let user_change = 0;
-let clone;
 
 //ready
 $(document).ready(function() {
@@ -327,6 +326,7 @@ class Game {
 	init() {
 		boardLeft = board.getBoundingClientRect().left;
 		this.score = 0;
+		this.ball.invinc = 0;
 		this.life = 3;
 		this.bar.init(100);
 		this.runningOut = 0;
