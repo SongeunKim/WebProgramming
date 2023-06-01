@@ -57,7 +57,7 @@ $(document).ready(function() {
 			if($("#settings").css("display") == "block"){
 				if(game.status == 0) {
 					$("#main-div").show();
-					if(muted==0){
+					if(muted==1){
 						bgm.play();
 					}
 				}else if(game.status==3){
