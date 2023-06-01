@@ -316,6 +316,10 @@ class Game {
 				$("#result").css("display", "block");
 			//...
 		}
+		if(game.status != 3){
+			clearTimeout(this.runningOutTimeout);
+			clearTimeout(this.items.itemList[3].defaultTimeout);
+		}
 	}
 
 	//게임 환경 초기화 함수
