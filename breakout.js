@@ -13,6 +13,7 @@ var snd;
 let muted = 1;
 let tutorial = 1;
 let user_change = 0;
+let clone;
 
 //ready
 $(document).ready(function() {
@@ -72,7 +73,6 @@ $(document).ready(function() {
 					game.status = 3;
 					game.audio.pause();
 					$("#pause").css("display", "block");
-					popUp($("#pause"));
 				}
 			}
 		}
@@ -150,8 +150,8 @@ $(document).ready(function() {
 	});
 	$("#setting_menu").click(function(){
 		$("#pause").css("display", "none");
+		$("#settings").appendTo($("#canvas-wrapper"));
 		$("#settings").css("display", "block");
-		popUp($("#settings"));
 	});
 	$("#main-start-button").click(function() {
 		if(tutorial == 1){
@@ -171,8 +171,8 @@ $(document).ready(function() {
 							setTimeout(function() {
 								$("#prologue-text").fadeOut(1000);
 								setTimeout(function() {
+									$("#main-div").css("display","block");
 									$("#level").css("display", "block");
-									popUp($("#level"));
 								}, 1000);
 							}, 3000);
 						}, 1000);
@@ -182,7 +182,6 @@ $(document).ready(function() {
 			}, 200);
 		}else{
 			$("#level").css("display", "block");
-			popUp($("#level"));
 		}
 	});
 	$("#level-easy").click(function(){
@@ -210,8 +209,8 @@ $(document).ready(function() {
 		game.start();
 	});
 	$("#main-settings-button").click(function(){
+		$("#settings").appendTo($("#main-div"));
 		$("#settings").css("display", "block");
-		popUp($("#settings"));
 	});
 	$("#sound-button").click(function(){
 		if(muted==0){
@@ -252,8 +251,8 @@ $(document).ready(function() {
 		$("#prologue-video").fadeOut(1000);
 		setTimeout(function() {
 			vd.get(0).pause();
+			$("#main-div").show();
 			$("#level").css("display", "block");
-			popUp($("#level"));
 		}, 1500);
 	});
 	//...
@@ -799,10 +798,4 @@ class Star extends Item {
 			game.ball.invinc = 0;
 		}, 5000);
 	}
-}
-
-function popUp(obj){
-	var w = ($(window).width()-obj.width())/2;
-	var h = ($(window).height()-obj.width())/2;
-	obj.css({top:h, left:w});
 }

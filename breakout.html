@@ -26,6 +26,13 @@
 			<div id="sound-button">
 				<img src="src/sound.png">
 			</div>
+			<!-- 난이도 선택창 -->
+			<div id="level" class="popup">
+				<div id="level-title">choose level</div>
+				<div id="level-easy" class="level-button">easy</div>
+				<div id="level-normal" class="level-button">normal</div>
+				<div id="level-hard" class="level-button">hard</div>
+			</div>
 		</div>
 
 		<!-- 게임 보드 화면 -->
@@ -34,14 +41,56 @@
 			<div id="score-bar"></div>
 			<!-- 게임 구성하는 화면 -->
 			<canvas id="board"></canvas>
+			<!-- 도움말 팝업 -->
+			<div id="help" class="popup">
+				<h3>HOW TO PLAY</h3>
+				<div id="help-content">
+					<div id="basic-help">
+						마우스를 움직여서 바를 이동!<br>
+						공을 벽돌에 맞추세요!<br><br>
+					</div>
+					<div id="item-help">
+					</div>
+					<div>
+						<img id="help_image" src="src/fire_flower.png">
+					</div>
+				</div>
+			</div>
+			<div id="pause" class="popup">
+				<div id="pause-title">pause</div>
+				<div id="resume">resume</div>
+				<div id="back_to_title">title</div>
+				<div id="setting_menu">setting</div>
+			</div>
+	
+			<!-- 게임 플레이 후 결과 창(WIN / LOSE) -->
+			<div id="result" class="popup">
+				<div id="result-title">
+					<!-- win 또는 lose 출력 -->
+					GAME CLEAR
+				</div>
+				<div class="result-home">HOME</div>
+				<div class="result-button">NEXT LEVEL</div>
+			</div>
 		</div>
 
-		<!-- 난이도 선택창 -->
-		<div id="level" class="popup">
-			<div id="level-title">choose level</div>
-			<div id="level-easy" class="level-button">easy</div>
-			<div id="level-normal" class="level-button">normal</div>
-			<div id="level-hard" class="level-button">hard</div>
+		<!-- 전반적 시나리오 프롤로그로 구성 -->
+		<div id="prologue-video" class="prologue">
+			<video width="900px" height="506px" >
+				<source src="src/intro.mp4" type="video/mp4">
+			</video>
+			<div id="prologue-skip">
+				skip
+			</div>
+		</div>
+		<div id="prologue-text" class="prologue-text">
+			<p id="text1">납치된 공주를 구하러 떠나는 마리오...</p>
+			<p id="text2">블록을 깨서 공주를 구해보자!</p>
+		</div>
+
+		<div id="ending-img">
+			<img id="ending-img1" src="src/ending1.png">
+			<img id="ending-img2" src="src/ending2.png">
 		</div>
 
 			<!-- 설정창 -->
@@ -74,58 +123,5 @@
 				<img id="image_show" src="src/ball.png">
 			</div>
 		</div>
-
-		<div id="pause" class="popup">
-			<div id="pause-title">pause</div>
-			<div id="resume">resume</div>
-			<div id="back_to_title">title</div>
-			<div id="setting_menu">setting</div>
-		</div>
-
-		<!-- 게임 플레이 후 결과 창(WIN / LOSE) -->
-		<div id="result" class="popup">
-			<div id="result-title">
-				<!-- win 또는 lose 출력 -->
-				GAME CLEAR
-			</div>
-			<div class="result-home">HOME</div>
-			<div class="result-button">NEXT LEVEL</div>
-		</div>
-
-		<!-- 전반적 시나리오 프롤로그로 구성 -->
-		<div id="prologue-video" class="prologue">
-			<video width="900px" height="506px" >
-				<source src="src/intro.mp4" type="video/mp4">
-			</video>
-			<div id="prologue-skip">
-				skip
-			</div>
-		</div>
-		<div id="prologue-text" class="prologue-text">
-			<p id="text1">납치된 공주를 구하러 떠나는 마리오...</p>
-			<p id="text2">블록을 깨서 공주를 구해보자!</p>
-		</div>
-
-		<div id="ending-img">
-			<img id="ending-img1" src="src/ending1.png">
-			<img id="ending-img2" src="src/ending2.png">
-		</div>
-
-		<!-- 도움말 팝업 -->
-		<div id="help" class="popup">
-			<h3>HOW TO PLAY</h3>
-			<div id="help-content">
-				<div id="basic-help">
-					마우스를 움직여서 바를 이동!<br>
-					공을 벽돌에 맞추세요!<br><br>
-				</div>
-				<div id="item-help">
-				</div>
-				<div>
-					<img id="help_image" src="src/fire_flower.png">
-				</div>
-			</div>
-		</div>
-		
 	</body>
 </html>
