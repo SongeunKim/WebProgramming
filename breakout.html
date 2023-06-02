@@ -18,6 +18,9 @@
 			</div>
 			<!-- 시작버튼 -->
 			<div id="main-start-button"><br>S T A R T</div>
+			<div id="boss">
+				<img src="src/goomba1.png">
+			</div>
 			<!-- 설정 버튼 -->
 			<div id="main-settings-button">
 				<!-- 설정 이모지(이미지) 삽입 -->
@@ -119,9 +122,11 @@
 				<option value="src/audio/normal_mode.mp3">노래2</option>
 				<option value="src/audio/hard_mode.mp3">노래3</option>
 			</select>
-			<div>
+			<div id="image_wrapper">
 				<img id="image_show" src="src/ball.png">
 			</div>
+			<label for="volume_control">volume control</label>
+			<input type="range" id="volume_control" min="0" max="10">
 		</div>
 	</body>
 </html>

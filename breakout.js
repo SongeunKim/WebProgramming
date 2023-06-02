@@ -1,4 +1,5 @@
 let mouseX;
+let mouseY;
 let scoreBar;
 let board;
 let boardCtx;
@@ -41,6 +42,16 @@ $(document).ready(function() {
 			$("#help").css("display", "block");
 		}
 	}
+
+	function selectStage(level){
+		$("#level").css("display", "none");
+		$("#main-div").hide();
+		helpPopup();
+		$("#canvas-wrapper").css("display", "block");
+		game.difficulty = level;
+		game.start();
+	}
+
 	function change_help_popup(){
 		var arr = ["꽃 – 타이머 시간 추가","초록버섯 – 목숨 추가","빨간버섯 – 바 길이","스타 – 피버타임"];
 		var src = ["src/fire_flower.png","src/mushroom_green.png","src/mushroom_red.png","src/star.png"];
@@ -87,6 +98,7 @@ $(document).ready(function() {
 	});
 	$(document).mousemove(function(e) {
 		mouseX = e.pageX - boardLeft;
+		mouseY = e.pageY;
 	})
 	$(document).click(function(){
 		if(tutorial !=4 && ($("#help").css("display")=="block")){
@@ -136,6 +148,11 @@ $(document).ready(function() {
 			var loop = true;
 			game.setMusic(source, loop)
 		}
+	});
+	$("#volume_control").on("change",function(){
+		bgm.volume = this.value/10;
+		game.audio.volume = this.value/10;
+		snd.volume = this.value/10;
 	});
 	$("#resume").click(function(){
 		$("#pause").css("display", "none");
@@ -191,28 +208,16 @@ $(document).ready(function() {
 		}
 	});
 	$("#level-easy").click(function(){
-		$("#level").css("display", "none");
-		$("#main-div").hide();
-		helpPopup();
-		$("#canvas-wrapper").css("display", "block");
-		game.difficulty = 0;
-		game.start();
+		selectStage(0);
 	});
 	$("#level-normal").click(function(){
-		$("#level").css("display", "none");
-		$("#main-div").hide();
-		helpPopup();
-		$("#canvas-wrapper").css("display", "block");
-		game.difficulty = 1;
-		game.start();
+		selectStage(1);
 	});
 	$("#level-hard").click(function(){
-		$("#level").css("display", "none");
-		$("#main-div").hide();
-		helpPopup();
-		$("#canvas-wrapper").css("display", "block");
-		game.difficulty = 2;
-		game.start();
+		selectStage(2);
+	});
+	$("#boss").click(function(){
+		selectStage(3);
 	});
 	$("#main-settings-button").click(function(){
 		$("#settings").appendTo($("#main-div"));
@@ -268,11 +273,13 @@ class Game {
 	constructor() {
 		this.bar = new Bar("src/bar.png", 100, 20, 8);
 		this.brick = new Brick("src/block.png", "src/block2.png", "src/question_block.png", 3, 18, 45, 45, 0, 45, 45);
-		this.ball = new Ball("src/ball.png", "src/ball_invinc.png", 5);
+		this.ball = new Ball("src/ball_red.png", "src/ball_invinc.png", 5);
+		this.boss = new boss("src/goomba2.png",45, 45, boardWidth/2, 3);
 		this.items = new Items();
 		this.audio = new Audio();
 		this.score = 0;
 		this.life = 0;
+		this.ending = 0;
 		this.status = 0; //0: not ready, 1: ready, 2: running
 		this.difficulty = 0; //0: easy, 1: normal, 2: hard
 		this.timer = 0;
@@ -308,7 +315,6 @@ class Game {
 				$("#result-title").html("GAME OVER");
 				$(".result-button").html("RETRY");
 				snd = new Audio("src/audio/game_over.mp3");
-				snd.volume = 0.5;
 				snd.play();
 			}
 			$("#result").css("display", "block");
@@ -339,7 +345,7 @@ class Game {
 			this.timer = 999;
 			this.timerPerFrame = 0;
 			this.ball.init(4);
-			this.brick.init(1, 2, 18);
+			this.brick.init(1, 2, 18, 45);
 			break;
 		case 1:
 			$("#board").css("background-image", "url(src/background2.jpg)");
@@ -351,7 +357,7 @@ class Game {
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(5);
-			this.brick.init(1, 3, 18);
+			this.brick.init(1, 3, 18, 45);
 			break;
 		case 2:
 			$("#board").css("background-image", "url(src/background3.jpg)");
@@ -363,8 +369,20 @@ class Game {
 			this.timer = 180;
 			this.timerPerFrame = 0.01;
 			this.ball.init(6);
-			this.brick.init(2, 4, 18);
+			this.brick.init(2, 4, 18, 45);
 			break;
+		case 3:
+			$("#board").css("background-image", "url(src/background3.jpg)");
+			if(user_change==1){
+				user_change=0;
+			}else{
+				game.setMusic('src/audio/hard_mode.mp3', true);
+			}
+			this.timer = 180;
+			this.timerPerFrame = 0.01;
+			this.ball.init(6);
+			this.brick.init(1, 2, 18, 90);
+			this.boss.init();
 		default:
 			break;
 		}
@@ -380,7 +398,6 @@ class Game {
 			this.audio.pause();
 			this.runningOut = 1;
 			snd = new Audio("src/audio/running_out.mp3");
-			snd.volume = 0.5;
 			snd.play();
 			this.runningOutTimeout = setTimeout(()=>this.audio.play(), 3500)
 			this.audio.playbackRate = 1.3;
@@ -392,9 +409,18 @@ class Game {
 		if(this.status == 3){
 			game.stop();
 		}
-		if (this.score >= this.brick.brickColumnCount*this.brick.brickRowCount){
+		if(this.boss.hp<=0){
+			$("#result").css("display", "block");
+				$("#result-title").html("GAME CLEAR");
+				$(".result-button").html("");
+				snd = new Audio("src/audio/game_clear.mp3");
+				snd.play();
+				game.stop();
+		}
+		if (this.score >= this.brick.brickColumnCount*this.brick.brickRowCount && this.difficulty != 3){
 			if (game.difficulty == 2) {
-				this.status = 0;
+				this.ending = 1;
+				$("#boss").show();
 				clearTimeout(this.runningOutTimeout);
 				game.stop();
 				$("#result").css("display", "none");
@@ -426,17 +452,18 @@ class Game {
 				$("#result-title").html("GAME CLEAR");
 				$(".result-button").html("NEXT LEVEL");
 				snd = new Audio("src/audio/game_clear.mp3");
-				snd.volume = 0.5;
 				snd.play();
-				game.stop();
 			}
-			game.status = 0;
+			this.status = 0;
 		}
 		this.bar.calculate();
 		if(this.status == 2) {
 			this.timer -= this.timerPerFrame;
-			this.ball.calculate(this.bar, this.brick, this.items);
+			this.ball.calculate(this.bar, this.brick, this.items, this.boss);
 			this.items.calculate(this.bar);
+			if(this.difficulty==3)
+				if(this.boss.hp > 0)
+					this.boss.calculate(this.ball);
 		}
 	}
 
@@ -447,16 +474,20 @@ class Game {
 		this.brick.draw();
 		this.ball.draw();
 		this.items.draw();
+		if(this.difficulty==3)
+			this.boss.draw();
 	}
 
 	updateScoreBar() {
 		let str = "life: " + this.life + ", score: " + this.score;
 		if(this.difficulty != 0)
 			str += ", time: " + parseInt(this.timer);
+		if(this.difficulty==3)
+			str +=", hp: " + parseInt(this.boss.hp);
 		scoreBar.html(str);
 	}
 
-	setMusic(source, loop, volume){
+	setMusic(source, loop){
 		this.audio.src = source;
 		this.audio.loop = loop;
 	}
@@ -484,7 +515,14 @@ class Bar {
 			this.x += Math.min(this.speed, mouseX - this.x);
 		else if (this.x > mouseX && this.x > this.width/2)
 			this.x -= Math.min(this.speed, this.x - mouseX);
-		this.y = boardHeight - this.height*2;
+		if(game.difficulty==3){
+			if (this.y < mouseY && this.y < boardHeight - this.height/2)
+			this.y += Math.min(this.speed, mouseY - this.y);
+			else if (this.y > mouseY && this.y > this.height/2)
+			this.y -= Math.min(this.speed, this.y - mouseY);
+		}else{
+			this.y = boardHeight - this.height*2;
+		}
 	}
 
 	//그리기 함수
@@ -505,6 +543,7 @@ class Ball {
 		this.angle = PI*3/2;
 		this.speed = speed;
 		this.invinc = 0;
+		this.damage = 1;
 	}
 
 	init(s) {
@@ -514,7 +553,7 @@ class Ball {
 		this.speed = s;
 	}
 
-	calculate(bar, brick, items) {
+	calculate(bar, brick, items, boss) {
 		//바닥에 닿았을 때
 		if ((this.ballY > (boardHeight - this.ballRadius)) && (this.angle > PI)) {
 			if(this.invinc == 0) {
@@ -551,7 +590,6 @@ class Ball {
 				if(this.angle >= PI) {
 					this.angle = PI/2 - ((this.ballX - bar.x)/(bar.width/2))*PI/3;
 					snd = new Audio("src/audio/fireball.mp3");
-					snd.volume = 0.5;
 					snd.play();
 				}
 			}
@@ -588,11 +626,35 @@ class Ball {
 					}
 					game.score += 1;
 					snd = new Audio("src/audio/breakblock.mp3");
-					snd.volume = 0.5;
 					snd.play();
 				}
 				if(isCol == 1)
 					break loop;
+			}
+		}
+		if(game.difficulty == 3 && boss.hp > 0 && boss.invinc == 0){
+			if((this.ballY + this.ballRadius >= boss.y) && (this.ballY - this.ballRadius <= boss.y + boss.height)) {
+				if((this.ballX >= boss.x) && (this.ballX <= boss.x + boss.width)) {
+					this.angle = 2*PI - this.angle;
+					boss.hp -= this.damage;
+					boss.invinc = 1;
+					setTimeout(()=>{
+						boss.invinc = 0;
+					}, 2000);
+				}
+			}
+			if((this.ballX + this.ballRadius >= boss.x) && (this.ballX - this.ballRadius <= boss.x + boss.width)) {
+				if((this.ballY >= boss.y) && (this.ballY <= boss.y + boss.height))	{
+					if (this.angle <= PI)
+						this.angle = PI - this.angle;
+					else
+						this.angle = 3*PI - this.angle;
+					boss.hp -= this.damage;
+					boss.invinc = 1;
+					setTimeout(()=>{
+						boss.invinc = 0;
+					}, 2000);
+				}
 			}
 		}
 		this.ballX += this.speed * Math.cos(this.angle);
@@ -626,9 +688,10 @@ class Brick {
 		this.bricks = [];
 	}
 
-	init(d, rowNum, colNum) {
+	init(d, rowNum, colNum, offset_top) {
 		this.brickColumnCount = colNum;
 		this.brickRowCount = rowNum;
+		this.brickOffsetTop = offset_top;
 		for(var i=0; i<this.brickColumnCount; i++){
 			this.bricks[i] = [];
 			for(var j=0; j<this.brickRowCount; j++){
@@ -761,14 +824,20 @@ class Item {
 class MushuroomR extends Item {
 	constructor(image, width, height) {
 		super(image, width, height, 1.5, -2);
+		this.defaultTimeout;
 	}
 
 	effect() {
 		snd = new Audio("src/audio/powerup.mp3");
-		snd.volume = 0.5;
 		snd.play();
-		
-		game.bar.width = game.bar.width * 2;
+		if(game.difficulty==3){
+			game.boss.attack.invinc = 1;
+			this.defaultTimeout = setTimeout(() => {
+				game.boss.attack.invinc = 0;
+			}, 3000);
+		}else{
+			game.bar.width = game.bar.width * 2;
+		}
 	}
 }
 
@@ -779,7 +848,6 @@ class MushuroomG extends Item {
 
 	effect() {
 		snd = new Audio("src/audio/powerup.mp3");
-		snd.volume = 0.5;
 		snd.play();
 
 		game.life++;
@@ -794,8 +862,8 @@ class FireFlower extends Item {
 
 	effect() {
 		snd = new Audio("src/audio/powerup.mp3");
-		snd.volume = 0.5;
 		snd.play();
+
 
 		game.timer += 30;
 	}
@@ -808,7 +876,6 @@ class Star extends Item {
 	}
 	effect() {
 		snd = new Audio("src/audio/powerup.mp3");
-		snd.volume = 0.5;
 		snd.play();
 
 		game.ball.speed = game.ball.speed * 2;
@@ -817,5 +884,89 @@ class Star extends Item {
 			game.ball.speed = game.ball.speed * 0.5;
 			game.ball.invinc = 0;
 		}, 5000);
+	}
+}
+
+class boss{
+	constructor(image, width, height, position_x, speed){
+		this.image = new Image();
+		this.image.src = image;
+		this.width = width;
+		this.height = height;
+		this.x = position_x;
+		this.y = 10;
+		this.hp = 10;
+		this.attack = new boss_attack("src/ball.png", "src/ball_invinc.png", 2);
+		this.speed = speed;
+		this.invinc = 0;
+	}
+
+	init(){
+		this.y = 10;
+		this.x = boardWidth/2;
+		this.attack.init();
+		this.hp = 10;
+	}
+
+	calculate(){
+		var direction = Math.pow(-1, Math.floor(Math.random()*100));
+		var move = direction*this.speed;
+		if((this.x + move >= 0) && (this.x + this.width + move <= boardWidth)){
+			this.x += move;
+		}
+		this.attack.calculate(game.bar);
+	}
+	
+	draw(){
+		if(this.hp > 0) {
+			boardCtx.drawImage(this.image, this.x, this.y, this.width, this.height);
+			this.attack.draw();
+		}
+	}
+}
+
+class boss_attack extends Ball {
+	constructor(image1, image2, speed){
+		super(image1, image2, speed);
+	}
+	init() {
+		this.ballX = game.boss.x + game.boss.width/2;
+		this.ballY = game.boss.height;
+		this.angle = PI*Math.random();
+	}
+
+	calculate(bar) {
+		if ((this.ballY > (boardHeight - this.ballRadius)) && (this.angle > PI)) {
+			this.ballX = game.boss.x + game.boss.width/2;
+			this.ballY = game.boss.height;
+			this.angle = PI*Math.random();
+		}
+
+		if ((this.ballX < (0 + this.ballRadius)) && (Math.cos(this.angle) < 0)) {
+			if (this.angle <= PI)
+				this.angle = PI - this.angle;
+			else
+				this.angle = 3*PI - this.angle;
+		}
+		else if ((this.ballX > (boardWidth-this.ballRadius)) && (Math.cos(this.angle) > 0)) {
+			if (this.angle <= PI)
+				this.angle = PI - this.angle;
+			else
+				this.angle = 3*PI - this.angle;
+		}
+		if ((this.ballY < (0 + this.ballRadius)) && (this.angle < PI)) {
+			this.angle = 2*PI - this.angle;
+		}
+
+		if((this.ballY + this.ballRadius > bar.y) && (this.ballY - this.ballRadius < bar.y + bar.height)) {
+			if((this.ballX + this.ballRadius > bar.x - bar.width/2) && (this.ballX - this.ballRadius < bar.x + bar.width/2)) {
+				if(this.invinc == 0) game.life -= this.damage;
+				this.ballX = game.boss.x + game.boss.width/2;
+				this.ballY = game.boss.height;
+				this.angle = PI*Math.random();
+			}
+		}
+		this.ballX += this.speed * Math.cos(this.angle);
+		this.ballY -= this.speed * Math.sin(this.angle);
 	}
 }
